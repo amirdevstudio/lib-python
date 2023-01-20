@@ -1,6 +1,9 @@
 from abc import ABC, abstractmethod
 from threading import Lock
 
+_default_args = ()
+_default_kwargs = {}
+
 
 class AbstractProvider(ABC):
     @abstractmethod
@@ -12,13 +15,13 @@ class AbstractServiceClassProvider(ABC, AbstractProvider):
     def __init__(
         self,
         cls,
-        cls_args: dict = None,
-        cls_kwargs: dict = None,
+        cls_args: dict = _default_args,
+        cls_kwargs: dict = _default_kwargs,
     ):
         self._lock = Lock()
         self.cls = cls
-        self.cls_args = cls_args or ()
-        self.cls_kwargs = cls_kwargs or {}
+        self.cls_args = cls_args
+        self.cls_kwargs = cls_kwargs
 
 
 class Singleton(AbstractServiceClassProvider):

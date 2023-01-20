@@ -1,10 +1,15 @@
 from threading import Lock
 from typing import Dict, Any, TypeVar, Type
 
-from amir_dev_studio.dependency_injection.providers import Singleton, Transient, AbstractProvider
-
+from amir_dev_studio.dependency_injection.providers import (
+    AbstractProvider,
+    Singleton,
+    Transient
+)
 
 _ArgumentNotSpecified = object()
+_default_args = ()
+_default_kwargs = {}
 _default_namespace = 'default'
 _provider_container: Dict[str, Dict[Type, AbstractProvider]] = {}
 _T = TypeVar('_T')
@@ -42,8 +47,8 @@ def get_service(
 
 def add_singleton_service(
         service_class,
-        service_init_args: tuple = None,
-        service_init_kwargs: dict = None,
+        service_init_args: tuple = _default_args,
+        service_init_kwargs: dict = _default_kwargs,
         namespace: str = _default_namespace,
 ):
     _add_service_to_container(
@@ -59,8 +64,8 @@ def add_singleton_service(
 
 def add_transient_service(
         service_class,
-        service_init_args: tuple = None,
-        service_init_kwargs: dict = None,
+        service_init_args: tuple = _default_args,
+        service_init_kwargs: dict = _default_kwargs,
         namespace: str = _default_namespace,
 ):
     _add_service_to_container(
@@ -74,16 +79,16 @@ def add_transient_service(
     )
 
 
-def add_abstract_transient_service(
+def add_abstract_singleton_service(
         abstract_class,
         concrete_class,
-        service_init_args: tuple = None,
-        service_init_kwargs: dict = None,
+        service_init_args: tuple = _default_args,
+        service_init_kwargs: dict = _default_kwargs,
         namespace: str = _default_namespace,
 ):
     _add_service_to_container(
         abstract_class,
-        Transient(
+        Singleton(
             concrete_class,
             service_init_args,
             service_init_kwargs,
@@ -92,16 +97,16 @@ def add_abstract_transient_service(
     )
 
 
-def add_abstract_singleton_service(
+def add_abstract_transient_service(
         abstract_class,
         concrete_class,
-        service_init_args: tuple = None,
-        service_init_kwargs: dict = None,
+        service_init_args: tuple = _default_args,
+        service_init_kwargs: dict = _default_kwargs,
         namespace: str = _default_namespace,
 ):
     _add_service_to_container(
         abstract_class,
-        Singleton(
+        Transient(
             concrete_class,
             service_init_args,
             service_init_kwargs,
