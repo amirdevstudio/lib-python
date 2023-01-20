@@ -1,14 +1,13 @@
+import logging
 from abc import ABC, abstractmethod
-from logging import Logger, getLogger
+from logging import Logger
 from threading import Lock
-
-_default_logger = getLogger(__name__)
 
 
 class AbstractExecutor(ABC):
-    def __init__(self, logger: Logger = _default_logger):
+    def __init__(self, logger: Logger = None):
         self._lock = Lock()
-        self._logger = logger
+        self._logger = logger or logging.getLogger(__name__)
 
     @abstractmethod
     def execute(self, *args, **kwargs):
