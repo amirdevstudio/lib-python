@@ -11,12 +11,13 @@ _T = TypeVar('_T')
 _thread_lock = Lock()
 
 
-def _add_service_to_container(service_class: Type, provider: BaseProvider, namespace: str = _default_namespace) -> None:
-    if (
-        namespace in _provider_container and
-        service_class in _provider_container[namespace]
-    ):
-        raise ValueError(f'Service {service_class} already exists in the container (namespace: {namespace})')
+def _add_service_to_container(
+        service_class: Type,
+        provider: BaseProvider,
+        namespace: str = _default_namespace
+) -> None:
+    if namespace in _provider_container and service_class in _provider_container[namespace]:
+        raise Exception(f"Service already exists for the given class: {service_class} (namespace: {namespace})")
 
     with _thread_lock:
         if namespace not in _provider_container:
@@ -25,21 +26,18 @@ def _add_service_to_container(service_class: Type, provider: BaseProvider, names
         _provider_container[namespace][service_class] = provider
 
 
-def get_service(service_class: Type, default: Any = _ArgumentNotSpecified, namespace: str = _default_namespace) -> _T:
-    if (
-        namespace not in _provider_container or
-        service_class not in _provider_container[namespace]
-    ):
+def get_service(
+        service_class: Type,
+        default: Any = _ArgumentNotSpecified,
+        namespace: str = _default_namespace
+) -> _T:
+    if namespace not in _provider_container or service_class not in _provider_container[namespace]:
         if default is not _ArgumentNotSpecified:
             return default
 
         raise Exception(f"No service was found for the given class: {service_class} (namespace: {namespace})")
 
     return _provider_container[namespace][service_class].get_service()
-
-
-def get_singleton_service(service_class: Type[_T], default=_ArgumentNotSpecified) -> _T:
-    return get_service(service_class, default, service_class)
 
 
 def add_singleton_service(
