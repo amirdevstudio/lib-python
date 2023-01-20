@@ -1,4 +1,8 @@
 from abc import ABC, abstractmethod
+from threading import Lock
+
+
+_lock = Lock()
 
 
 class BaseProvider(ABC):
@@ -25,8 +29,9 @@ class Singleton(BaseServiceClassProvider):
         self.instance = None
 
     def get_service(self):
-        if not self.instance:
-            self.instance = self.cls(*self.cls_args, **self.cls_kwargs)
+        with _lock:
+            if not self.instance:
+                self.instance = self.cls(*self.cls_args, **self.cls_kwargs)
         return self.instance
 
 

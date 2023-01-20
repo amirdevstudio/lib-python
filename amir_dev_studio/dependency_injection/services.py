@@ -1,3 +1,4 @@
+from threading import Lock
 from typing import Dict, Any, TypeVar, Type
 
 from amir_dev_studio.dependency_injection.providers import Singleton, Transient, BaseProvider
@@ -7,6 +8,7 @@ _ArgumentNotSpecified = object()
 _default_namespace = 'default'
 _provider_container: Dict[str, Dict[Type, BaseProvider]] = {}
 _T = TypeVar('_T')
+_thread_lock = Lock()
 
 
 def _add_service_to_container(service_class: Type, provider: BaseProvider, namespace: str = _default_namespace) -> None:
@@ -16,10 +18,11 @@ def _add_service_to_container(service_class: Type, provider: BaseProvider, names
     ):
         raise ValueError(f'Service {service_class} already exists in the container (namespace: {namespace})')
 
-    if namespace not in _provider_container:
-        _provider_container[namespace] = {}
+    with _thread_lock:
+        if namespace not in _provider_container:
+            _provider_container[namespace] = {}
 
-    _provider_container[namespace][service_class] = provider
+        _provider_container[namespace][service_class] = provider
 
 
 def get_service(service_class: Type, default: Any = _ArgumentNotSpecified, namespace: str = _default_namespace) -> _T:
