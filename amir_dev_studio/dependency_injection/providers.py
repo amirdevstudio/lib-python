@@ -2,13 +2,13 @@ from abc import ABC, abstractmethod
 from threading import Lock
 
 
-class BaseProvider(ABC):
+class AbstractProvider(ABC):
     @abstractmethod
     def get_service(self):
         ...
 
 
-class BaseServiceClassProvider(ABC, BaseProvider):
+class AbstractServiceClassProvider(ABC, AbstractProvider):
     def __init__(
         self,
         cls,
@@ -21,7 +21,7 @@ class BaseServiceClassProvider(ABC, BaseProvider):
         self.cls_kwargs = cls_kwargs or {}
 
 
-class Singleton(BaseServiceClassProvider):
+class Singleton(AbstractServiceClassProvider):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.instance = None
@@ -33,7 +33,7 @@ class Singleton(BaseServiceClassProvider):
         return self.instance
 
 
-class Transient(BaseServiceClassProvider):
+class Transient(AbstractServiceClassProvider):
     def get_service(self):
         with self._lock:
             return self.cls(*self.cls_args, **self.cls_kwargs)

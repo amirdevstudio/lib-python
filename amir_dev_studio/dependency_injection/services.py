@@ -1,19 +1,19 @@
 from threading import Lock
 from typing import Dict, Any, TypeVar, Type
 
-from amir_dev_studio.dependency_injection.providers import Singleton, Transient, BaseProvider
+from amir_dev_studio.dependency_injection.providers import Singleton, Transient, AbstractProvider
 
 
 _ArgumentNotSpecified = object()
 _default_namespace = 'default'
-_provider_container: Dict[str, Dict[Type, BaseProvider]] = {}
+_provider_container: Dict[str, Dict[Type, AbstractProvider]] = {}
 _T = TypeVar('_T')
 _thread_lock = Lock()
 
 
 def _add_service_to_container(
         service_class: Type,
-        provider: BaseProvider,
+        provider: AbstractProvider,
         namespace: str = _default_namespace
 ) -> None:
     if namespace in _provider_container and service_class in _provider_container[namespace]:
