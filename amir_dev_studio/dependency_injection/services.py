@@ -1,5 +1,5 @@
 from threading import Lock
-from typing import Dict, Any, TypeVar, Type
+from typing import Any, Dict, TypeVar, Type
 
 from amir_dev_studio.dependency_injection.providers import (
     AbstractProvider,
@@ -7,7 +7,7 @@ from amir_dev_studio.dependency_injection.providers import (
     Transient
 )
 
-_ArgumentNotSpecified = object()
+_undefined = object()
 _default_args = ()
 _default_kwargs = {}
 _default_namespace = 'default'
@@ -33,11 +33,11 @@ def _add_service_to_registry(
 
 def get_service(
         service_class: Type,
-        default: Any = _ArgumentNotSpecified,
+        default: Any = _undefined,
         namespace: str = _default_namespace
 ) -> _T:
     if namespace not in _provider_registry or service_class not in _provider_registry[namespace]:
-        if default is not _ArgumentNotSpecified:
+        if default is not _undefined:
             return default
 
         raise Exception(f"No service was found for the given class: {service_class} (namespace: {namespace})")
