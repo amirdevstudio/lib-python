@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from amir_dev_studio.event_broker.base import AbstractEvent
+from amir_dev_studio.events.base import AbstractEvent
 
 
 @dataclass(frozen=True)

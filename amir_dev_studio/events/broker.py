@@ -1,5 +1,5 @@
-from amir_dev_studio.event_broker.base import AbstractEventBroker
-from amir_dev_studio.event_broker.event import Event
+from amir_dev_studio.events.base import AbstractEventBroker
+from amir_dev_studio.events.event import Event
 
 
 class EventBroker(AbstractEventBroker):

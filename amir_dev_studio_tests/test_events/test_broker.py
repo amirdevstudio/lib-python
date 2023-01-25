@@ -1,4 +1,4 @@
-from amir_dev_studio.event_broker import EventBroker
+from amir_dev_studio.events import EventBroker
 
 broker = EventBroker()
 broker.add_subscriber('test', print)
