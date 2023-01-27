@@ -37,7 +37,7 @@ def _add_service_to_registry(
 
 
 def get_service(
-        service_class: Type,
+        service_class: Type[_T],
         default: Any = _undefined,
         namespace: str = _default_namespace
 ) -> _T:
