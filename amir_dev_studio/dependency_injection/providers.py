@@ -11,7 +11,7 @@ class AbstractProvider(ABC):
         ...
 
 
-class AbstractServiceClassProvider(ABC, AbstractProvider):
+class AbstractServiceClassProvider(AbstractProvider, ABC):
     def __init__(
         self,
         cls,

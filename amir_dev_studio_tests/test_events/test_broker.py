@@ -1,5 +1,7 @@
-from amir_dev_studio.events import EventBroker
+from amir_dev_studio.events.broker import EventBroker
+from amir_dev_studio.events.event import Event
 
 broker = EventBroker()
 broker.add_subscriber('test', print)
-broker.add_publisher(...)
+broker.publish(Event('test'))
+
