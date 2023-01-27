@@ -16,6 +16,11 @@ _T = TypeVar('_T')
 _thread_lock = Lock()
 
 
+def _validate_is_subclass(abstract_class, concrete_class):
+    if not issubclass(concrete_class, abstract_class):
+        raise Exception(f"Class {concrete_class.__name__} is not a subclass of {abstract_class.__name__}")
+
+
 def _add_service_to_registry(
         service_class: Type,
         provider: AbstractProvider,
@@ -80,12 +85,13 @@ def add_transient_service(
 
 
 def add_abstract_singleton_service(
-        abstract_class,
-        concrete_class,
+        abstract_class: Type,
+        concrete_class: Type,
         service_init_args: tuple = _default_args,
         service_init_kwargs: dict = _default_kwargs,
         namespace: str = _default_namespace,
 ):
+    _validate_is_subclass(abstract_class, concrete_class)
     _add_service_to_registry(
         abstract_class,
         Singleton(
@@ -104,6 +110,7 @@ def add_abstract_transient_service(
         service_init_kwargs: dict = _default_kwargs,
         namespace: str = _default_namespace,
 ):
+    _validate_is_subclass(abstract_class, concrete_class)
     _add_service_to_registry(
         abstract_class,
         Transient(
