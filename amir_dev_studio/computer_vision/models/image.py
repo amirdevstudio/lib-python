@@ -5,6 +5,7 @@ from dataclasses import dataclass, field
 import cv2
 import numpy as np
 
+from amir_dev_studio.class_utils import copy_self_and_apply_mutator_fn
 from amir_dev_studio.computer_vision.enums import ColorSpaces
 from amir_dev_studio.computer_vision.models.base import BaseModel
 from amir_dev_studio.computer_vision.models.circle import Circle
@@ -12,12 +13,6 @@ from amir_dev_studio.computer_vision.models.color import Color
 from amir_dev_studio.computer_vision.models.line import Line
 from amir_dev_studio.computer_vision.models.point import Point
 from amir_dev_studio.computer_vision.models.rectangle import Rectangle
-
-
-def copy_self_and_apply_method(self, fn: callable, *args, **kwargs):
-    self_copy = self.__copy__()
-    fn(self_copy, *args, **kwargs)
-    return self_copy
 
 
 @dataclass
@@ -231,64 +226,64 @@ class Image(BaseModel):
         self.trim_right_(right)
 
     def apply_color_space_conversion(self, color_space: ColorSpaces):
-        return copy_self_and_apply_method(self, self.apply_color_space_conversion_, color_space)
+        return copy_self_and_apply_mutator_fn(self, self.__class__.apply_color_space_conversion_, color_space)
 
     def apply_contrast(self, value: float):
-        return copy_self_and_apply_method(self, self.apply_contrast_, value)
+        return copy_self_and_apply_mutator_fn(self, self.__class__.apply_contrast_, value)
 
     def apply_gaussian_blur(self, kernel_size: int):
-        return copy_self_and_apply_method(self, self.apply_gaussian_blur_, kernel_size)
+        return copy_self_and_apply_mutator_fn(self, self.__class__.apply_gaussian_blur_, kernel_size)
 
     def apply_grayscale_conversion(self):
-        return copy_self_and_apply_method(self, self.apply_grayscale_conversion_)
+        return copy_self_and_apply_mutator_fn(self, self.__class__.apply_grayscale_conversion_)
 
     def apply_rgb_conversion(self):
-        return copy_self_and_apply_method(self, self.apply_rgb_conversion_)
+        return copy_self_and_apply_mutator_fn(self, self.__class__.apply_rgb_conversion_)
 
     def concat_horizontal(self, image: Image):
-        return copy_self_and_apply_method(self, self.concat_horizontal_, image)
+        return copy_self_and_apply_mutator_fn(self, self.__class__.concat_horizontal_, image)
 
     def concat_vertical(self, image: Image):
-        return copy_self_and_apply_method(self, self.concat_vertical_, image)
+        return copy_self_and_apply_mutator_fn(self, self.__class__.concat_vertical_, image)
 
     def draw_circle(self, circle: Circle, color: Color, thickness: int = 2):
-        return copy_self_and_apply_method(self, self.draw_circle_, circle, color, thickness)
+        return copy_self_and_apply_mutator_fn(self, self.__class__.draw_circle_, circle, color, thickness)
 
     def draw_line(self, line: Line, color: Color, thickness: int = 2):
-        return copy_self_and_apply_method(self, self.draw_line_, line, color, thickness)
+        return copy_self_and_apply_mutator_fn(self, self.__class__.draw_line_, line, color, thickness)
 
     def draw_rectangle(self, rectangle: Rectangle, color: Color, thickness: int = 2):
-        return copy_self_and_apply_method(self, self.draw_rectangle_, rectangle, color, thickness)
+        return copy_self_and_apply_mutator_fn(self, self.__class__.draw_rectangle_, rectangle, color, thickness)
 
     def draw_text(self, text: str, position: Point, color: Color, font_scale: float = 1, thickness: int = 1):
-        return copy_self_and_apply_method(self, self.draw_text_, text, position, color, font_scale, thickness)
+        return copy_self_and_apply_mutator_fn(self, self.__class__.draw_text_, text, position, color, font_scale, thickness)
 
     def render_circles(self):
-        return copy_self_and_apply_method(self, self.render_circles_)
+        return copy_self_and_apply_mutator_fn(self, self.__class__.render_circles_)
 
     def render_lines(self):
-        return copy_self_and_apply_method(self, self.render_lines_)
+        return copy_self_and_apply_mutator_fn(self, self.__class__.render_lines_)
 
     def render_rectangles(self):
-        return copy_self_and_apply_method(self, self.render_rectangles_)
+        return copy_self_and_apply_mutator_fn(self, self.__class__.render_rectangles_)
 
     def render_texts(self):
-        return copy_self_and_apply_method(self, self.render_texts_)
+        return copy_self_and_apply_mutator_fn(self, self.__class__.render_texts_)
 
     def resize(self, scale: float):
-        return copy_self_and_apply_method(self, self.resize_, scale)
+        return copy_self_and_apply_mutator_fn(self, self.__class__.resize_, scale)
 
     def trim_top(self, pixels: int):
-        return copy_self_and_apply_method(self, self.trim_top_, pixels)
+        return copy_self_and_apply_mutator_fn(self, self.__class__.trim_top_, pixels)
 
     def trim_bottom(self, pixels: int):
-        return copy_self_and_apply_method(self, self.trim_bottom_, pixels)
+        return copy_self_and_apply_mutator_fn(self, self.__class__.trim_bottom_, pixels)
 
     def trim_left(self, pixels: int):
-        return copy_self_and_apply_method(self, self.trim_left_, pixels)
+        return copy_self_and_apply_mutator_fn(self, self.__class__.trim_left_, pixels)
 
     def trim_right(self, pixels: int):
-        return copy_self_and_apply_method(self, self.trim_right_, pixels)
+        return copy_self_and_apply_mutator_fn(self, self.__class__.trim_right_, pixels)
 
     def trim(self, *args: int):
-        return copy_self_and_apply_method(self, self.trim_, *args)
+        return copy_self_and_apply_mutator_fn(self, self.__class__.trim_, *args)
