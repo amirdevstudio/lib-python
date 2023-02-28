@@ -20,3 +20,8 @@ class TestImageCase(TestCase):
         image.draw_rectangle_(Rectangle(Point(30, 30), Point(40, 40)), Colors.GREEN)
         image.render_rectangles_()
         image.show()
+
+    def test_apply_brightness(self):
+        image = Image.create_blank(100, 100)
+        image = image.apply_brightness_(100)
+        image.show()

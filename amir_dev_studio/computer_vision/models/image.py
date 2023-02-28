@@ -113,17 +113,11 @@ class Image(BaseModel):
     def apply_rgb_conversion_(self):
         self.apply_color_space_conversion_(ColorSpaces.RGB)
 
-    def blank_copy(self):
-        return Image.create_blank(self.height, self.width)
-
     def concat_horizontal_(self, image: Image):
         self.pixels = np.concatenate((self.pixels, image.pixels), axis=1)
 
     def concat_vertical_(self, image: Image):
         self.pixels = np.concatenate((self.pixels, image.pixels), axis=0)
-
-    def copy(self) -> Image:
-        return self.__copy__()
 
     def draw_circle_(self, circle: Circle, color: Color, thickness: int = 2):
         self.circles.append((circle, color, thickness))
@@ -136,17 +130,6 @@ class Image(BaseModel):
 
     def draw_text_(self, text: str, position: Point, color: Color, font_scale: float = 1, thickness: int = 1):
         self.texts.append((text, position, color, font_scale, thickness))
-
-    def iter_resized_copies(self, start, stop, count):
-        diff = abs(stop - start)
-        step = diff / count
-
-        for i in range(count):
-            scale = start + (step * i)
-            res = self.__copy__()
-            res.resize_(scale)
-
-            yield res
 
     def render_circles_(self):
         for circle, color, thickness in self.circles:
@@ -211,10 +194,6 @@ class Image(BaseModel):
             interpolation=cv2.INTER_AREA
         )
 
-    def show(self, title: str = 'Image', wait_key: int = 0):
-        cv2.imshow(title, self.pixels)
-        cv2.waitKey(wait_key)
-
     def trim_top_(self, pixels: int):
         self.pixels = self.pixels[pixels:]
 
@@ -245,6 +224,9 @@ class Image(BaseModel):
         self.trim_bottom_(bottom)
         self.trim_right_(right)
 
+    def apply_brightness(self, value: float):
+        return copy_self_and_apply_mutator_fn(self, self.__class__.apply_brightness_, value)
+
     def apply_color_space_conversion(self, color_space: ColorSpaces):
         return copy_self_and_apply_mutator_fn(self, self.__class__.apply_color_space_conversion_, color_space)
 
@@ -260,11 +242,17 @@ class Image(BaseModel):
     def apply_rgb_conversion(self):
         return copy_self_and_apply_mutator_fn(self, self.__class__.apply_rgb_conversion_)
 
+    def blank_copy(self):
+        return self.__class__.create_blank(self.width, self.height)
+
     def concat_horizontal(self, image: Image):
         return copy_self_and_apply_mutator_fn(self, self.__class__.concat_horizontal_, image)
 
     def concat_vertical(self, image: Image):
         return copy_self_and_apply_mutator_fn(self, self.__class__.concat_vertical_, image)
+
+    def copy(self) -> Image:
+        return self.__copy__()
 
     def draw_circle(self, circle: Circle, color: Color, thickness: int = 2):
         return copy_self_and_apply_mutator_fn(self, self.__class__.draw_circle_, circle, color, thickness)
@@ -277,6 +265,13 @@ class Image(BaseModel):
 
     def draw_text(self, text: str, position: Point, color: Color, font_scale: float = 1, thickness: int = 1):
         return copy_self_and_apply_mutator_fn(self, self.__class__.draw_text_, text, position, color, font_scale, thickness)
+
+    def iter_resized_copies(self, start, stop, count):
+        step = abs(stop - start) / count
+
+        for i in range(count):
+            scale = start + (step * i)
+            yield copy_self_and_apply_mutator_fn(self, self.__class__.resize_, scale)
 
     def render_circles(self):
         return copy_self_and_apply_mutator_fn(self, self.__class__.render_circles_)
@@ -292,6 +287,10 @@ class Image(BaseModel):
 
     def resize(self, scale: float):
         return copy_self_and_apply_mutator_fn(self, self.__class__.resize_, scale)
+
+    def show(self, title: str = 'Image', wait_key: int = 0):
+        cv2.imshow(title, self.pixels)
+        cv2.waitKey(wait_key)
 
     def trim_top(self, pixels: int):
         return copy_self_and_apply_mutator_fn(self, self.__class__.trim_top_, pixels)
