@@ -32,6 +32,7 @@ class Image(BaseModel):
     def __copy__(self):
         return Image(
             color_space=self.color_space,
+            name=self.name,
             pixels=self.pixels.copy(),
             circles=self.circles.copy(),
             lines=self.lines.copy(),
