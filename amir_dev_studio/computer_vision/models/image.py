@@ -17,30 +17,34 @@ from amir_dev_studio.computer_vision.models.rectangle import Rectangle
 
 @dataclass
 class Image(BaseModel):
-    data: np.ndarray
+    pixels: np.ndarray
     color_space: ColorSpaces
 
-    circles: list = field(default_factory=list, init=False)
-    lines: list = field(default_factory=list, init=False)
-    rectangles: list = field(default_factory=list, init=False)
-    texts: list = field(default_factory=list, init=False)
+    circles: list = field(default_factory=list)
+    lines: list = field(default_factory=list)
+    rectangles: list = field(default_factory=list)
+    texts: list = field(default_factory=list)
 
     def __copy__(self):
         return Image(
-            data=self.data.copy(),
-            color_space=self.color_space
+            pixels=self.pixels.copy(),
+            color_space=self.color_space,
+            circles=self.circles.copy(),
+            lines=self.lines.copy(),
+            rectangles=self.rectangles.copy(),
+            texts=self.texts.copy()
         )
 
     def __repr__(self):
-        return f'<Image width={self.width} height={self.height} shape={self.data.shape} >'
+        return f'<Image width={self.width} height={self.height} shape={self.pixels.shape} >'
 
     @property
     def width(self):
-        return self.data.shape[1]
+        return self.pixels.shape[1]
 
     @property
     def height(self):
-        return self.data.shape[0]
+        return self.pixels.shape[0]
 
     @property
     def center(self) -> Point:
@@ -49,9 +53,21 @@ class Image(BaseModel):
     @classmethod
     def create_blank(cls, height: int, width: int, channels: int = 3) -> Image:
         return cls(
-            data=np.zeros((height, width, channels), np.uint8),
+            pixels=np.zeros((height, width, channels), np.uint8),
             color_space=ColorSpaces.BGR
         )
+
+    @classmethod
+    def create_from_pixels(cls, pixels: np.ndarray, color_space: ColorSpaces) -> Image:
+        return cls(
+            pixels=pixels,
+            color_space=color_space
+        )
+
+    @classmethod
+    def create_from_path(cls, path: str) -> Image:
+        pixels = cv2.imread(path)
+        return cls.create_from_pixels(pixels, ColorSpaces.BGR)
 
     def apply_brightness_(self, value: float):
         if value > 0:
@@ -65,7 +81,7 @@ class Image(BaseModel):
         alpha = (max_ - shadow) / 255
         gamma = shadow
 
-        self.data = cv2.addWeighted(self.data, alpha, self.data, 0, gamma)
+        self.pixels = cv2.addWeighted(self.pixels, alpha, self.pixels, 0, gamma)
 
         return self
     
@@ -79,20 +95,20 @@ class Image(BaseModel):
         if not (conversion := conversions.get(conversion_key)):
             raise Exception(f'Could not convert {self.color_space} to {color_space}')
 
-        self.data = cv2.cvtColor(self.data, conversion)
+        self.pixels = cv2.cvtColor(self.pixels, conversion)
         self.color_space = color_space
 
     def apply_contrast_(self, value: float):
         alpha = float(131 * (value + 127)) / (127 * (131 - value))
         gamma = 127 * (1 - alpha)
-        self.data = cv2.addWeighted(self.data, alpha, self.data, 0, gamma)
+        self.pixels = cv2.addWeighted(self.pixels, alpha, self.pixels, 0, gamma)
 
     def apply_gaussian_blur_(self, kernel_size: int):
-        self.data = cv2.GaussianBlur(self.data, (kernel_size, kernel_size), 0)
+        self.pixels = cv2.GaussianBlur(self.pixels, (kernel_size, kernel_size), 0)
 
     def apply_grayscale_conversion_(self):
         self.apply_color_space_conversion_(ColorSpaces.GRAY)
-        self.data = np.stack((self.data,) * 3, axis=-1)
+        self.pixels = np.stack((self.pixels,) * 3, axis=-1)
 
     def apply_rgb_conversion_(self):
         self.apply_color_space_conversion_(ColorSpaces.RGB)
@@ -101,10 +117,10 @@ class Image(BaseModel):
         return Image.create_blank(self.height, self.width)
 
     def concat_horizontal_(self, image: Image):
-        self.data = np.concatenate((self.data, image.data), axis=1)
+        self.pixels = np.concatenate((self.pixels, image.pixels), axis=1)
 
     def concat_vertical_(self, image: Image):
-        self.data = np.concatenate((self.data, image.data), axis=0)
+        self.pixels = np.concatenate((self.pixels, image.pixels), axis=0)
 
     def copy(self) -> Image:
         return self.__copy__()
@@ -135,7 +151,7 @@ class Image(BaseModel):
     def render_circles_(self):
         for circle, color, thickness in self.circles:
             cv2.circle(
-                self.data,
+                self.pixels,
                 circle.center.xy_ints,
                 circle.radius,
                 color.bgr,
@@ -145,7 +161,7 @@ class Image(BaseModel):
     def render_lines_(self):
         for line, color, thickness in self.lines:
             cv2.line(
-                self.data,
+                self.pixels,
                 line.pt1.xy_ints,
                 line.pt2.xy_ints,
                 color.bgr,
@@ -155,7 +171,7 @@ class Image(BaseModel):
     def render_rectangles_(self):
         for rectangle, color, thickness in self.rectangles:
             cv2.rectangle(
-                self.data,
+                self.pixels,
                 rectangle.top_left.xy_ints,
                 rectangle.bottom_right.xy_ints,
                 color.bgr,
@@ -164,7 +180,7 @@ class Image(BaseModel):
 
     def render_text_(self, text: str, position: Point, color: Color, font_scale: float = 1, thickness: int = 1):
         cv2.putText(
-            self.data,
+            self.pixels,
             text,
             position.xy_ints,
             cv2.FONT_HERSHEY_SIMPLEX,
@@ -176,7 +192,7 @@ class Image(BaseModel):
     def render_texts_(self):
         for text, position, color, font_scale, thickness in self.texts:
             cv2.putText(
-                self.data,
+                self.pixels,
                 text,
                 position.xy_ints,
                 cv2.FONT_HERSHEY_SIMPLEX,
@@ -189,23 +205,27 @@ class Image(BaseModel):
         new_width = int(self.width * scale)
         new_height = int(self.height * scale)
 
-        self.data = cv2.resize(
-            self.data,
+        self.pixels = cv2.resize(
+            self.pixels,
             (new_width, new_height),
             interpolation=cv2.INTER_AREA
         )
 
+    def show(self, title: str = 'Image', wait_key: int = 0):
+        cv2.imshow(title, self.pixels)
+        cv2.waitKey(wait_key)
+
     def trim_top_(self, pixels: int):
-        self.data = self.data[pixels:]
+        self.pixels = self.pixels[pixels:]
 
     def trim_bottom_(self, pixels: int):
-        self.data = self.data[:-pixels]
+        self.pixels = self.pixels[:-pixels]
 
     def trim_left_(self, pixels: int):
-        self.data = self.data[:, pixels:]
+        self.pixels = self.pixels[:, pixels:]
 
     def trim_right_(self, pixels: int):
-        self.data = self.data[:, :-pixels]
+        self.pixels = self.pixels[:, :-pixels]
 
     def trim_(self, *args: int):
         if len(args) == 1:
