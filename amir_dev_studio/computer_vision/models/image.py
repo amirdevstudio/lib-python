@@ -1,33 +1,34 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from typing import List
 
 import cv2
 import numpy as np
 
 from amir_dev_studio.class_utils import copy_self_and_apply_mutator_fn
 from amir_dev_studio.computer_vision.enums import ColorSpaces
-from amir_dev_studio.computer_vision.models.base import BaseModel
+from amir_dev_studio.computer_vision.models.base import Model
+from amir_dev_studio.computer_vision.models.bbox_annotation import BoundingBoxAnnotation
 from amir_dev_studio.computer_vision.models.circle import Circle
 from amir_dev_studio.computer_vision.models.color import Color
 from amir_dev_studio.computer_vision.models.line import Line
 from amir_dev_studio.computer_vision.models.point import Point
 from amir_dev_studio.computer_vision.models.rectangle import Rectangle
-
-
-_default_image_name = 'Untitled'
+from amir_dev_studio.computer_vision.models.text import Text
 
 
 @dataclass
-class Image(BaseModel):
+class Image(Model):
     color_space: ColorSpaces
-    name: str
     pixels: np.ndarray
 
-    circles: list = field(default_factory=list)
-    lines: list = field(default_factory=list)
-    rectangles: list = field(default_factory=list)
-    texts: list = field(default_factory=list)
+    name: str = 'Untitled'
+    bounding_boxes: List[BoundingBoxAnnotation] = field(default_factory=list)
+    circles: List[Circle] = field(default_factory=list)
+    lines: List[Line] = field(default_factory=list)
+    rectangles: List[Rectangle] = field(default_factory=list)
+    texts: List[Text] = field(default_factory=list)
 
     def __copy__(self):
         return Image(
@@ -56,25 +57,38 @@ class Image(BaseModel):
         return Point(self.width / 2, self.height / 2)
 
     @classmethod
-    def create_blank(cls, height: int, width: int, channels: int = 3, *, name: str = _default_image_name) -> Image:
+    def create_blank(cls, height: int, width: int, channels: int = 3) -> Image:
         return cls(
-            name=name,
             pixels=np.zeros((height, width, channels), np.uint8),
             color_space=ColorSpaces.BGR
         )
 
     @classmethod
-    def create_from_pixels(cls, pixels: np.ndarray, color_space: ColorSpaces, *, name: str = _default_image_name) -> Image:
+    def create_from_pixels(cls, pixels: np.ndarray, color_space: ColorSpaces) -> Image:
         return cls(
-            name=name,
             pixels=pixels,
             color_space=color_space
         )
 
     @classmethod
-    def create_from_path(cls, path: str, name: str = _default_image_name) -> Image:
+    def create_from_path(cls, path: str) -> Image:
         pixels = cv2.imread(path)
-        return cls.create_from_pixels(pixels, ColorSpaces.BGR, name=name)
+        return cls.create_from_pixels(pixels, ColorSpaces.BGR)
+
+    def add_bounding_box_(self, bounding_box: BoundingBoxAnnotation):
+        self.bounding_boxes.append(bounding_box)
+
+    def add_circle_(self, circle: Circle):
+        self.circles.append(circle)
+
+    def add_line_(self, line: Line):
+        self.lines.append(line)
+
+    def add_rectangle_(self, rectangle: Rectangle):
+        self.rectangles.append(rectangle)
+
+    def add_text_(self, text: Text):
+        self.texts.append(text)
 
     def apply_brightness_(self, value: float):
         if value > 0:
@@ -126,69 +140,46 @@ class Image(BaseModel):
     def concat_vertical_(self, image: Image):
         self.pixels = np.concatenate((self.pixels, image.pixels), axis=0)
 
-    def draw_circle_(self, circle: Circle, color: Color, thickness: int = 2):
-        self.circles.append((circle, color, thickness))
-
-    def draw_line_(self, line: Line, color: Color, thickness: int = 2):
-        self.lines.append((line, color, thickness))
-
-    def draw_rectangle_(self, rectangle: Rectangle, color: Color, thickness: int = 2):
-        self.rectangles.append((rectangle, color, thickness))
-
-    def draw_text_(self, text: str, position: Point, color: Color, font_scale: float = 1, thickness: int = 1):
-        self.texts.append((text, position, color, font_scale, thickness))
-
     def render_circles_(self):
-        for circle, color, thickness in self.circles:
+        for circle in self.circles:
             cv2.circle(
                 self.pixels,
                 circle.center.xy_ints,
                 circle.radius,
-                color.bgr,
-                thickness=thickness
+                circle.color.bgr,
+                thickness=circle.thickness
             )
 
     def render_lines_(self):
-        for line, color, thickness in self.lines:
+        for line in self.lines:
             cv2.line(
                 self.pixels,
                 line.pt1.xy_ints,
                 line.pt2.xy_ints,
-                color.bgr,
-                thickness=thickness
+                line.color.bgr,
+                thickness=line.thickness
             )
 
     def render_rectangles_(self):
-        for rectangle, color, thickness in self.rectangles:
+        for rectangle in self.rectangles:
             cv2.rectangle(
                 self.pixels,
                 rectangle.top_left.xy_ints,
                 rectangle.bottom_right.xy_ints,
-                color.bgr,
-                thickness=thickness
+                rectangle.color.bgr,
+                thickness=rectangle.thickness
             )
 
-    def render_text_(self, text: str, position: Point, color: Color, font_scale: float = 1, thickness: int = 1):
-        cv2.putText(
-            self.pixels,
-            text,
-            position.xy_ints,
-            cv2.FONT_HERSHEY_SIMPLEX,
-            font_scale,
-            color.bgr,
-            thickness=thickness
-        )
-
     def render_texts_(self):
-        for text, position, color, font_scale, thickness in self.texts:
+        for text in self.texts:
             cv2.putText(
                 self.pixels,
                 text,
-                position.xy_ints,
+                text.position.xy_ints,
                 cv2.FONT_HERSHEY_SIMPLEX,
-                font_scale,
-                color.bgr,
-                thickness=thickness
+                text.font_scale,
+                text.color.bgr,
+                thickness=text.thickness
             )
 
     def resize_(self, scale: float):
@@ -231,6 +222,21 @@ class Image(BaseModel):
         self.trim_bottom_(bottom)
         self.trim_right_(right)
 
+    def add_bounding_box(self, bounding_box: BoundingBoxAnnotation, color: Color, thickness: int = 2):
+        return copy_self_and_apply_mutator_fn(self, self.__class__.add_bounding_box_, bounding_box, color, thickness)
+
+    def add_circle(self, circle: Circle):
+        return copy_self_and_apply_mutator_fn(self, self.__class__.add_circle_, circle)
+
+    def add_line(self, line: Line):
+        return copy_self_and_apply_mutator_fn(self, self.__class__.add_line_, line)
+
+    def add_rectangle(self, rectangle: Rectangle):
+        return copy_self_and_apply_mutator_fn(self, self.__class__.add_rectangle_, rectangle)
+
+    def add_text(self, text: Text):
+        return copy_self_and_apply_mutator_fn(self, self.__class__.add_text_, text)
+
     def apply_brightness(self, value: float):
         return copy_self_and_apply_mutator_fn(self, self.__class__.apply_brightness_, value)
 
@@ -260,18 +266,6 @@ class Image(BaseModel):
 
     def copy(self) -> Image:
         return self.__copy__()
-
-    def draw_circle(self, circle: Circle, color: Color, thickness: int = 2):
-        return copy_self_and_apply_mutator_fn(self, self.__class__.draw_circle_, circle, color, thickness)
-
-    def draw_line(self, line: Line, color: Color, thickness: int = 2):
-        return copy_self_and_apply_mutator_fn(self, self.__class__.draw_line_, line, color, thickness)
-
-    def draw_rectangle(self, rectangle: Rectangle, color: Color, thickness: int = 2):
-        return copy_self_and_apply_mutator_fn(self, self.__class__.draw_rectangle_, rectangle, color, thickness)
-
-    def draw_text(self, text: str, position: Point, color: Color, font_scale: float = 1, thickness: int = 1):
-        return copy_self_and_apply_mutator_fn(self, self.__class__.draw_text_, text, position, color, font_scale, thickness)
 
     def iter_resized_copies(self, start, stop, count):
         step = abs(stop - start) / count

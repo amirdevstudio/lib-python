@@ -1,11 +1,11 @@
 from dataclasses import dataclass
 from math import dist
 
-from amir_dev_studio.computer_vision.models.base import BaseModel
+from amir_dev_studio.computer_vision.models.base import Model
 
 
 @dataclass
-class Point(BaseModel):
+class Point(Model):
     x: float
     y: float
 

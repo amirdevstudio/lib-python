@@ -1,10 +1,11 @@
 from dataclasses import dataclass
 
+from amir_dev_studio.computer_vision.models.base import RenderableShape
 from amir_dev_studio.computer_vision.models.point import Point
 
 
 @dataclass
-class Rectangle:
+class Rectangle(RenderableShape):
     pt1: Point
     pt2: Point
 
@@ -36,6 +37,22 @@ class Rectangle:
     @property
     def left(self) -> float:
         return self.top_left.x
+
+    @property
+    def color(self):
+        return self.render_args.get('color')
+
+    @color.setter
+    def color(self, value):
+        self.render_args['color'] = value
+
+    @property
+    def thickness(self):
+        return self.render_args.get('thickness')
+
+    @thickness.setter
+    def thickness(self, value):
+        self.render_args['thickness'] = value
 
     @property
     def right(self) -> float:

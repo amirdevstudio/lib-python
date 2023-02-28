@@ -1,11 +1,14 @@
 from dataclasses import dataclass
 from math import acos, cos, pi, sin
+from typing import Optional
 
+from amir_dev_studio.computer_vision.models.base import RenderableShape
+from amir_dev_studio.computer_vision.models.color import Color
 from amir_dev_studio.computer_vision.models.point import Point
 
 
 @dataclass
-class Circle:
+class Circle(RenderableShape):
     center: Point
     radius: float
 
@@ -14,20 +17,36 @@ class Circle:
         return self.radius * 2 * pi
 
     @property
+    def max_x(self) -> Point:
+        return Point(self.center.x + self.radius, self.center.y)
+
+    @property
     def max_y(self) -> Point:
         return Point(self.center.x, self.center.y + self.radius)
+
+    @property
+    def min_x(self) -> Point:
+        return Point(self.center.x - self.radius, self.center.y)
 
     @property
     def min_y(self) -> Point:
         return Point(self.center.x, self.center.y - self.radius)
 
     @property
-    def max_x(self) -> Point:
-        return Point(self.center.x + self.radius, self.center.y)
+    def color(self) -> Optional[Color]:
+        return self.render_args.get('color')
+
+    @color.setter
+    def color(self, value: Color):
+        self.render_args['color'] = value
 
     @property
-    def min_x(self) -> Point:
-        return Point(self.center.x - self.radius, self.center.y)
+    def thickness(self) -> Optional[int]:
+        return self.render_args.get('thickness')
+
+    @thickness.setter
+    def thickness(self, value: int):
+        self.render_args['thickness'] = value
 
     @classmethod
     def from_xyr(cls, x: float, y: float, radius: float):

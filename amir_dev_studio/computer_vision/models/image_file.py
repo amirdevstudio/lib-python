@@ -16,4 +16,4 @@ class ImageFile:
 
     def read_image(self):
         data = cv2.imread(str(self.path))
-        return Image(data, color_space=ColorSpaces.BGR)
+        return Image(pixels=data, color_space=ColorSpaces.BGR)
