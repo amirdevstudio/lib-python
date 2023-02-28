@@ -15,10 +15,14 @@ from amir_dev_studio.computer_vision.models.point import Point
 from amir_dev_studio.computer_vision.models.rectangle import Rectangle
 
 
+_default_image_name = 'Untitled'
+
+
 @dataclass
 class Image(BaseModel):
-    pixels: np.ndarray
     color_space: ColorSpaces
+    name: str
+    pixels: np.ndarray
 
     circles: list = field(default_factory=list)
     lines: list = field(default_factory=list)
@@ -27,8 +31,8 @@ class Image(BaseModel):
 
     def __copy__(self):
         return Image(
-            pixels=self.pixels.copy(),
             color_space=self.color_space,
+            pixels=self.pixels.copy(),
             circles=self.circles.copy(),
             lines=self.lines.copy(),
             rectangles=self.rectangles.copy(),
@@ -51,23 +55,25 @@ class Image(BaseModel):
         return Point(self.width / 2, self.height / 2)
 
     @classmethod
-    def create_blank(cls, height: int, width: int, channels: int = 3) -> Image:
+    def create_blank(cls, height: int, width: int, channels: int = 3, *, name: str = _default_image_name) -> Image:
         return cls(
+            name=name,
             pixels=np.zeros((height, width, channels), np.uint8),
             color_space=ColorSpaces.BGR
         )
 
     @classmethod
-    def create_from_pixels(cls, pixels: np.ndarray, color_space: ColorSpaces) -> Image:
+    def create_from_pixels(cls, pixels: np.ndarray, color_space: ColorSpaces, *, name: str = _default_image_name) -> Image:
         return cls(
+            name=name,
             pixels=pixels,
             color_space=color_space
         )
 
     @classmethod
-    def create_from_path(cls, path: str) -> Image:
+    def create_from_path(cls, path: str, name: str = _default_image_name) -> Image:
         pixels = cv2.imread(path)
-        return cls.create_from_pixels(pixels, ColorSpaces.BGR)
+        return cls.create_from_pixels(pixels, ColorSpaces.BGR, name=name)
 
     def apply_brightness_(self, value: float):
         if value > 0:
