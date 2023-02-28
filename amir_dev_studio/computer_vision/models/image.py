@@ -296,8 +296,10 @@ class Image(BaseModel):
         return copy_self_and_apply_mutator_fn(self, self.__class__.resize_, scale)
 
     def show(self, title: str = None, wait_key: int = 0):
-        cv2.imshow(title or self.name, self.pixels)
+        title = title or self.name
+        cv2.imshow(title, self.pixels)
         cv2.waitKey(wait_key)
+        cv2.destroyWindow(title)
 
     def trim_top(self, pixels: int):
         return copy_self_and_apply_mutator_fn(self, self.__class__.trim_top_, pixels)
