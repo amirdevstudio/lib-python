@@ -1,8 +1,9 @@
 from abc import ABC, abstractmethod
 from threading import Lock
 
-_default_args = ()
-_default_kwargs = {}
+from amir_dev_studio.dependency_injection.globals import (
+    default_args, default_kwargs
+)
 
 
 class AbstractProvider(ABC):
@@ -15,8 +16,8 @@ class AbstractServiceClassProvider(AbstractProvider, ABC):
     def __init__(
         self,
         cls,
-        cls_args: dict = _default_args,
-        cls_kwargs: dict = _default_kwargs,
+        cls_args: tuple = default_args,
+        cls_kwargs: dict = default_kwargs,
     ):
         self._lock = Lock()
         self.cls = cls

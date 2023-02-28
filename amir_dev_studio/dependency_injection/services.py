@@ -6,11 +6,13 @@ from amir_dev_studio.dependency_injection.providers import (
     Singleton,
     Transient
 )
+from amir_dev_studio.dependency_injection.globals import (
+    default_args,
+    default_kwargs,
+    default_namespace,
+    undefined
+)
 
-_undefined = object()
-_default_args = ()
-_default_kwargs = {}
-_default_namespace = 'default'
 _provider_registry: Dict[str, Dict[Type, AbstractProvider]] = {}
 _T = TypeVar('_T')
 _thread_lock = Lock()
@@ -24,7 +26,7 @@ def _validate_is_subclass(abstract_class, concrete_class):
 def _add_service_to_registry(
         service_class: Type,
         provider: AbstractProvider,
-        namespace: str = _default_namespace
+        namespace: str = default_namespace
 ) -> None:
     if namespace in _provider_registry and service_class in _provider_registry[namespace]:
         raise Exception(f"Service already exists for the given class: {service_class} (namespace: {namespace})")
@@ -38,11 +40,11 @@ def _add_service_to_registry(
 
 def get_service(
         service_class: Type[_T],
-        default: Any = _undefined,
-        namespace: str = _default_namespace
+        default: Any = undefined,
+        namespace: str = default_namespace
 ) -> _T:
     if namespace not in _provider_registry or service_class not in _provider_registry[namespace]:
-        if default is not _undefined:
+        if default is not undefined:
             return default
 
         raise Exception(f"No service was found for the given class: {service_class} (namespace: {namespace})")
@@ -52,9 +54,9 @@ def get_service(
 
 def add_singleton_service(
         service_class,
-        service_init_args: tuple = _default_args,
-        service_init_kwargs: dict = _default_kwargs,
-        namespace: str = _default_namespace,
+        service_init_args: tuple = default_args,
+        service_init_kwargs: dict = default_kwargs,
+        namespace: str = default_namespace,
 ):
     _add_service_to_registry(
         service_class,
@@ -69,9 +71,9 @@ def add_singleton_service(
 
 def add_transient_service(
         service_class,
-        service_init_args: tuple = _default_args,
-        service_init_kwargs: dict = _default_kwargs,
-        namespace: str = _default_namespace,
+        service_init_args: tuple = default_args,
+        service_init_kwargs: dict = default_kwargs,
+        namespace: str = default_namespace,
 ):
     _add_service_to_registry(
         service_class,
@@ -87,9 +89,9 @@ def add_transient_service(
 def add_abstract_singleton_service(
         abstract_class: Type,
         concrete_class: Type,
-        service_init_args: tuple = _default_args,
-        service_init_kwargs: dict = _default_kwargs,
-        namespace: str = _default_namespace,
+        service_init_args: tuple = default_args,
+        service_init_kwargs: dict = default_kwargs,
+        namespace: str = default_namespace,
 ):
     _validate_is_subclass(abstract_class, concrete_class)
     _add_service_to_registry(
@@ -106,9 +108,9 @@ def add_abstract_singleton_service(
 def add_abstract_transient_service(
         abstract_class,
         concrete_class,
-        service_init_args: tuple = _default_args,
-        service_init_kwargs: dict = _default_kwargs,
-        namespace: str = _default_namespace,
+        service_init_args: tuple = default_args,
+        service_init_kwargs: dict = default_kwargs,
+        namespace: str = default_namespace,
 ):
     _validate_is_subclass(abstract_class, concrete_class)
     _add_service_to_registry(
