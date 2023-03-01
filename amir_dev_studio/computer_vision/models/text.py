@@ -36,3 +36,7 @@ class Text(str, RenderableShape):
     @property
     def thickness(self) -> int:
         return self.render_args.get('thickness')
+
+    @thickness.setter
+    def thickness(self, value: int):
+        self.render_args['thickness'] = value
