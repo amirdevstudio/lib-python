@@ -1,13 +1,20 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
-from amir_dev_studio.computer_vision.models.base import RenderableShape
+from amir_dev_studio.computer_vision.models.base import Model
+from amir_dev_studio.computer_vision.models.color import Color
+from amir_dev_studio.computer_vision.models.configs import get_default_render_thickness, get_default_render_color
 from amir_dev_studio.computer_vision.models.point import Point
 
 
 @dataclass
-class Rectangle(RenderableShape):
+class Rectangle(Model):
     pt1: Point
     pt2: Point
+
+    def __post_init__(self):
+        assert self.pt1.xy != self.pt2.xy, 'Rectangle cannot have zero area'
+        assert self.pt1.x != self.pt2.x, 'Rectangle width cannot be 0'
+        assert self.pt1.y != self.pt2.y, 'Rectangle height cannot be 0'
 
     def __repr__(self):
         return f'Rectangle({self.top_left.xy}, {self.bottom_right.xy})'
@@ -37,22 +44,6 @@ class Rectangle(RenderableShape):
     @property
     def left(self) -> float:
         return self.top_left.x
-
-    @property
-    def color(self):
-        return self.render_args.get('color')
-
-    @color.setter
-    def color(self, value):
-        self.render_args['color'] = value
-
-    @property
-    def thickness(self):
-        return self.render_args.get('thickness')
-
-    @thickness.setter
-    def thickness(self, value):
-        self.render_args['thickness'] = value
 
     @property
     def right(self) -> float:
@@ -138,3 +129,19 @@ class Rectangle(RenderableShape):
             self.width / image_width,
             self.height / image_height
         )
+
+
+@dataclass
+class RenderableRectangle(Rectangle):
+    color: Color
+    thickness: int
+
+    @classmethod
+    def from_rectangle(cls, rect: Rectangle, color: Color = None, thickness: int = None):
+        return cls(
+            rect.pt1,
+            rect.pt2,
+            color or get_default_render_color(),
+            thickness or get_default_render_thickness()
+        )
+

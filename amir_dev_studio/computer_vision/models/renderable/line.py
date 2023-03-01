@@ -1,9 +1,9 @@
-from dataclasses import dataclass
-from typing import Optional
+from dataclasses import dataclass, field
 
 from amir_dev_studio.computer_vision.enums import CardinalDirections, OrdinalDirections
 from amir_dev_studio.computer_vision.models.base import Model
 from amir_dev_studio.computer_vision.models.color import Color
+from amir_dev_studio.computer_vision.models.configs import get_default_render_color, get_default_render_thickness
 from amir_dev_studio.computer_vision.models.point import Point
 from amir_dev_studio.extended_datatypes import Number
 
@@ -51,28 +51,23 @@ class Line(Model):
             return OrdinalDirections.DOWN_RIGHT
 
     @property
-    def render_args_dict(self) -> dict:
-        return self.extra_data.get('render_args', {})
-
-    @property
-    def color(self) -> Optional[Color]:
-        return self.render_args_dict.get('color', None)
-
-    @color.setter
-    def color(self, color: Color):
-        self.render_args_dict['color'] = color
-
-    @property
-    def thickness(self) -> Optional[int]:
-        return self.render_args_dict.get('thickness', None)
-
-    @thickness.setter
-    def thickness(self, thickness: int):
-        self.render_args_dict['thickness'] = thickness
-
-    @property
     def slope(self) -> Number:
         return Number(
             (self.pt2.y - self.pt1.y) /
             (self.pt2.x - self.pt1.x)
+        )
+
+
+@dataclass
+class RenderableLine(Line):
+    color: Color
+    thickness: Number
+
+    @classmethod
+    def from_line(cls, line: Line, color: Color = None, thickness: Number = None):
+        return cls(
+            line.pt1,
+            line.pt2,
+            color or get_default_render_color(),
+            thickness or get_default_render_thickness()
         )

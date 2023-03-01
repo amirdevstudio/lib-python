@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from amir_dev_studio.computer_vision.models.text import Text
+from amir_dev_studio.computer_vision.models.renderable.text import Text
 
 
 class TestText(TestCase):
