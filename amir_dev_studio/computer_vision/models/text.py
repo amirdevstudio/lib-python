@@ -7,6 +7,8 @@ from amir_dev_studio.computer_vision.models.point import Point
 
 @dataclass
 class Text(str, RenderableShape):
+    value: str
+
     @property
     def position(self) -> Point:
         return self.render_args.get('position')
