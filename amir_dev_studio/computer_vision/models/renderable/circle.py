@@ -1,14 +1,14 @@
 from dataclasses import dataclass
 from math import acos, cos, pi, sin
-from typing import Optional
 
-from amir_dev_studio.computer_vision.models.base import RenderableShape
+from amir_dev_studio.computer_vision.models.base import Model
 from amir_dev_studio.computer_vision.models.color import Color
+from amir_dev_studio.computer_vision.models.configs import get_default_render_color, get_default_render_thickness
 from amir_dev_studio.computer_vision.models.point import Point
 
 
 @dataclass
-class Circle(RenderableShape):
+class Circle(Model):
     center: Point
     radius: float
 
@@ -32,40 +32,16 @@ class Circle(RenderableShape):
     def min_y(self) -> Point:
         return Point(self.center.x, self.center.y - self.radius)
 
-    @property
-    def color(self) -> Optional[Color]:
-        return self.render_args.get('color')
-
-    @color.setter
-    def color(self, value: Color):
-        self.render_args['color'] = value
-
-    @property
-    def thickness(self) -> Optional[int]:
-        return self.render_args.get('thickness')
-
-    @thickness.setter
-    def thickness(self, value: int):
-        self.render_args['thickness'] = value
-
     @classmethod
     def from_xyr(cls, x: float, y: float, radius: float):
         center = Point(x, y)
         return cls(center, radius)
 
-    def to_xyr(self) -> tuple[float, float, float]:
-        return self.center.x, self.center.y, self.radius
-
-    def radians_between(self, pt1: Point, pt2: Point) -> float:
-        c = pt1.distance_from(pt2)
-        a = b = self.radius
-        return acos((a ** 2 + b ** 2 - c ** 2) / (2 * a * b))
+    def arc_length_between(self, pt1: Point, pt2: Point):
+        return self.radians_between(pt1, pt2) * self.radius
 
     def degrees_between(self, pt1: Point, pt2: Point) -> float:
         return self.radians_between(pt1, pt2) * (180 / pi)
-
-    def arc_length_between(self, pt1: Point, pt2: Point):
-        return self.radians_between(pt1, pt2) * self.radius
 
     def list_points_on_circumference(self, steps: int, clockwise: bool = True) -> list[Point]:
         radians_per_step = (2 * pi) / steps
@@ -81,3 +57,26 @@ class Circle(RenderableShape):
             points.reverse()
 
         return points
+
+    def radians_between(self, pt1: Point, pt2: Point) -> float:
+        c = pt1.distance_from(pt2)
+        a = b = self.radius
+        return acos((a ** 2 + b ** 2 - c ** 2) / (2 * a * b))
+
+    def to_xyr(self) -> tuple[float, float, float]:
+        return self.center.x, self.center.y, self.radius
+
+
+@dataclass
+class RenderableCircle(Circle):
+    color: Color
+    thickness: int
+
+    @classmethod
+    def from_circle(cls, circle: Circle, color: Color = None, thickness: int = None):
+        return cls(
+            circle.center,
+            circle.radius,
+            color or get_default_render_color(),
+            thickness or get_default_render_thickness(),
+        )
