@@ -187,7 +187,7 @@ class Image(Model):
         for text in self.texts:
             cv2.putText(
                 self.pixels,
-                text,
+                text.value,
                 text.position.xy_ints,
                 cv2.FONT_HERSHEY_SIMPLEX,
                 text.font_scale,
