@@ -222,8 +222,8 @@ class Image(Model):
         self.trim_bottom_(bottom)
         self.trim_right_(right)
 
-    def add_bounding_box(self, bounding_box: BoundingBoxAnnotation, color: Color, thickness: int = 2):
-        return copy_self_and_apply_mutator_fn(self, self.__class__.add_bounding_box_, bounding_box, color, thickness)
+    def add_bounding_box(self, bounding_box: BoundingBoxAnnotation):
+        return copy_self_and_apply_mutator_fn(self, self.__class__.add_bounding_box_, bounding_box)
 
     def add_circle(self, circle: Circle):
         return copy_self_and_apply_mutator_fn(self, self.__class__.add_circle_, circle)
