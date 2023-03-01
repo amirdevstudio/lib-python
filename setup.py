@@ -9,7 +9,7 @@ for package in find_packages():
 
 setup(
     name='amir-dev-studio',
-    version='0.0.4',
+    version='0.0.1',
     packages=_packages,
     install_requires=[]
 )

@@ -62,16 +62,23 @@ class Image(Model):
         )
 
     @classmethod
-    def create_from_pixels(cls, pixels: np.ndarray, color_space: ColorSpaces) -> Image:
+    def create_from_pixels(cls, pixels: np.ndarray, color_space: ColorSpaces, *args, **kwargs) -> Image:
         return cls(
             pixels=pixels,
-            color_space=color_space
+            color_space=color_space,
+            *args,
+            **kwargs
         )
 
     @classmethod
-    def create_from_path(cls, path: str) -> Image:
+    def create_from_path(cls, path: str, *args, **kwargs) -> Image:
         pixels = cv2.imread(path)
-        return cls.create_from_pixels(pixels, ColorSpaces.BGR)
+        return cls.create_from_pixels(
+            pixels,
+            ColorSpaces.BGR,
+            *args,
+            **kwargs
+        )
 
     def add_bounding_box(self, bounding_box: BoundingBoxAnnotation):
         self.bounding_boxes.append(bounding_box)
