@@ -9,3 +9,14 @@ class BoundingBoxAnnotation:
     class_id: int
     confidence: float
     rect: Rectangle
+
+    def __copy__(self):
+        return BoundingBoxAnnotation(
+            self.class_name,
+            self.class_id,
+            self.confidence,
+            self.rect
+        )
+
+    def copy(self):
+        return self.__copy__()

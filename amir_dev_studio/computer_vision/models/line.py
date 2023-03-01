@@ -13,6 +13,9 @@ class Line(Model):
     pt1: Point
     pt2: Point
 
+    def __copy__(self):
+        return Line(self.pt1, self.pt2)
+
     @property
     def cardinal_direction(self):
         if self.pt2.is_left_of(self.pt1):

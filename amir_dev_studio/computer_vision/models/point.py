@@ -9,6 +9,9 @@ class Point(Model):
     x: float
     y: float
 
+    def __copy__(self):
+        return Point(self.x, self.y)
+
     @property
     def quadrant(self) -> int:
         if self.x > 0:

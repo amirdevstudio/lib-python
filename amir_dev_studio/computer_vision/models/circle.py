@@ -12,6 +12,9 @@ class Circle(Model):
     center: Point
     radius: float
 
+    def __copy__(self):
+        return Circle(self.center, self.radius)
+
     @property
     def circumference(self) -> float:
         return self.radius * 2 * pi

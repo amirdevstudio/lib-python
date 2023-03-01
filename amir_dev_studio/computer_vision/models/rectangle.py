@@ -11,6 +11,9 @@ class Rectangle(Model):
     pt1: Point
     pt2: Point
 
+    def __copy__(self):
+        return Rectangle(self.pt1, self.pt2)
+
     def __post_init__(self):
         assert self.pt1.xy != self.pt2.xy, 'Rectangle cannot have zero area'
         assert self.pt1.x != self.pt2.x, 'Rectangle width cannot be 0'

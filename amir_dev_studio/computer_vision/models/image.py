@@ -21,7 +21,7 @@ class Image(Model):
     color_space: ColorSpaces
     pixels: np.ndarray
     name: str = 'Untitled'
-    
+
     bounding_boxes: List[BoundingBoxAnnotation] = field(default_factory=list)
     circles: List[RenderableCircle] = field(default_factory=list)
     lines: List[RenderableLine] = field(default_factory=list)
@@ -31,8 +31,9 @@ class Image(Model):
     def __copy__(self):
         return Image(
             color_space=self.color_space,
-            name=self.name,
             pixels=self.pixels.copy(),
+            name=self.name,
+            bounding_boxes=self.bounding_boxes.copy(),
             circles=self.circles.copy(),
             lines=self.lines.copy(),
             rectangles=self.rectangles.copy(),
@@ -110,7 +111,7 @@ class Image(Model):
         self.pixels = cv2.addWeighted(self.pixels, alpha, self.pixels, 0, gamma)
 
         return self
-    
+
     def apply_color_space_conversion(self, color_space: ColorSpaces):
         conversion_key = (self.color_space, color_space)
         conversions = {

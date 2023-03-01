@@ -1,11 +1,16 @@
 from dataclasses import dataclass
 
+from amir_dev_studio.computer_vision.models.base import Model
+
 
 @dataclass
-class Color:
+class Color(Model):
     b: int
     g: int
     r: int
+
+    def __copy__(self):
+        return Color(self.b, self.g, self.r)
 
     @property
     def bgr(self):

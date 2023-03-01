@@ -31,3 +31,13 @@ class TestImageCase(TestCase):
         image.add_text(text)
         image.render_texts()
         image.show()
+
+    def test_copy_image(self):
+        image = Image.create_blank(100, 100)
+        image.add_rectangle(RenderableRectangle(Point(10, 10), Point(20, 20), Colors.RED, 1))
+        image.add_rectangle(RenderableRectangle(Point(30, 30), Point(40, 40), Colors.GREEN, 1))
+
+        image_copy = image.copy()
+
+        assert len(image_copy.rectangles) == 2
+        assert len(image.rectangles) == 2
