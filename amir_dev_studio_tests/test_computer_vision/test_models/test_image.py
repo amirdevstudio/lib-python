@@ -3,8 +3,8 @@ from unittest import TestCase
 from amir_dev_studio.computer_vision.constants import Colors
 from amir_dev_studio.computer_vision.models.image import Image
 from amir_dev_studio.computer_vision.models.point import Point
-from amir_dev_studio.computer_vision.models.renderable.rectangle import Rectangle
-from amir_dev_studio.computer_vision.models.renderable.text import Text
+from amir_dev_studio.computer_vision.models.rectangle import Rectangle
+from amir_dev_studio.computer_vision.models.text import Text
 
 
 class TestImageCase(TestCase):

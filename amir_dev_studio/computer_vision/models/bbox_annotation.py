@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from amir_dev_studio.computer_vision.models.renderable.rectangle import Rectangle
+from amir_dev_studio.computer_vision.models.rectangle import Rectangle
 
 
 @dataclass

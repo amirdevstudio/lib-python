@@ -9,11 +9,11 @@ import numpy as np
 from amir_dev_studio.computer_vision.enums import ColorSpaces
 from amir_dev_studio.computer_vision.models.base import Model
 from amir_dev_studio.computer_vision.models.bbox_annotation import BoundingBoxAnnotation
-from amir_dev_studio.computer_vision.models.renderable.circle import RenderableCircle
-from amir_dev_studio.computer_vision.models.renderable.line import RenderableLine
+from amir_dev_studio.computer_vision.models.circle import RenderableCircle
+from amir_dev_studio.computer_vision.models.line import RenderableLine
 from amir_dev_studio.computer_vision.models.point import Point
-from amir_dev_studio.computer_vision.models.renderable.rectangle import RenderableRectangle
-from amir_dev_studio.computer_vision.models.renderable.text import RenderableText
+from amir_dev_studio.computer_vision.models.rectangle import RenderableRectangle
+from amir_dev_studio.computer_vision.models.text import RenderableText
 
 
 @dataclass
