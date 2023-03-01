@@ -25,7 +25,7 @@ class Point(Model):
     def xy_ints(self):
         return int(self.x), int(self.y)
 
-    def copy_with_offset(self, x: int = 0, y: int = 0):
+    def translate(self, x: int = 0, y: int = 0):
         return Point(self.x + x, self.y + y)
 
     def distance_from(self, other: 'Point'):
