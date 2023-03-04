@@ -1,13 +1,16 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
-from amir_dev_studio.computer_vision.models.base import Model
+from amir_dev_studio.computer_vision.models.base import Base
 from amir_dev_studio.computer_vision.models.color import Color
 from amir_dev_studio.computer_vision.models.configs import get_default_render_thickness, get_default_render_color
 from amir_dev_studio.computer_vision.models.point import Point
 
 
 @dataclass
-class Rectangle(Model):
+class Rectangle(Base):
+    """
+    A rectangle defined by two opposite corners.
+    """
     pt1: Point
     pt2: Point
 
@@ -135,7 +138,7 @@ class Rectangle(Model):
 
 
 @dataclass
-class RenderableRectangle(Rectangle):
+class DrawableRectangle(Rectangle):
     color: Color
     thickness: int
 

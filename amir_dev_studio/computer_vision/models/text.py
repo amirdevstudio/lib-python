@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from amir_dev_studio.computer_vision.models.base import Model
+from amir_dev_studio.computer_vision.models.base import Base
 from amir_dev_studio.computer_vision.models.color import Color
 from amir_dev_studio.computer_vision.models.configs import (
     get_default_render_thickness,
@@ -11,7 +11,7 @@ from amir_dev_studio.computer_vision.models.point import Point
 
 
 @dataclass
-class RenderableText(Model):
+class RenderableText(Base):
     value: str
     position: Point
 

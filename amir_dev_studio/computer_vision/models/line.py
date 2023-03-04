@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 
 from amir_dev_studio.computer_vision.enums import CardinalDirections, OrdinalDirections
-from amir_dev_studio.computer_vision.models.base import Model
+from amir_dev_studio.computer_vision.models.base import Base
 from amir_dev_studio.computer_vision.models.color import Color
 from amir_dev_studio.computer_vision.models.configs import get_default_render_color, get_default_render_thickness
 from amir_dev_studio.computer_vision.models.point import Point
@@ -9,7 +9,7 @@ from amir_dev_studio.extended_datatypes import Number
 
 
 @dataclass
-class Line(Model):
+class Line(Base):
     pt1: Point
     pt2: Point
 
@@ -62,7 +62,7 @@ class Line(Model):
 
 
 @dataclass
-class RenderableLine(Line):
+class DrawableLine(Line):
     color: Color
     thickness: Number
 

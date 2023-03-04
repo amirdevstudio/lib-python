@@ -7,31 +7,33 @@ import cv2
 import numpy as np
 
 from amir_dev_studio.computer_vision.enums import ColorSpaces
-from amir_dev_studio.computer_vision.models.base import Model
-from amir_dev_studio.computer_vision.models.bbox_annotation import BoundingBoxAnnotation
-from amir_dev_studio.computer_vision.models.circle import RenderableCircle
-from amir_dev_studio.computer_vision.models.line import RenderableLine
+from amir_dev_studio.computer_vision.models.base import Base
+from amir_dev_studio.computer_vision.models.bbox_annotation import DrawableBoundingBox
+from amir_dev_studio.computer_vision.models.circle import DrawableCircle
+from amir_dev_studio.computer_vision.models.line import DrawableLine
 from amir_dev_studio.computer_vision.models.point import Point
-from amir_dev_studio.computer_vision.models.rectangle import RenderableRectangle
+from amir_dev_studio.computer_vision.models.rectangle import DrawableRectangle
 from amir_dev_studio.computer_vision.models.text import RenderableText
 
 
 @dataclass
-class Image(Model):
-    color_space: ColorSpaces
+class Image(Base):
     pixels: np.ndarray
-    name: str = 'Untitled'
+    color_space: ColorSpaces
 
-    bounding_boxes: List[BoundingBoxAnnotation] = field(default_factory=list)
-    circles: List[RenderableCircle] = field(default_factory=list)
-    lines: List[RenderableLine] = field(default_factory=list)
-    rectangles: List[RenderableRectangle] = field(default_factory=list)
+    name: str = 'Untitled'
+    path: str = None
+
+    bounding_boxes: List[DrawableBoundingBox] = field(default_factory=list)
+    circles: List[DrawableCircle] = field(default_factory=list)
+    lines: List[DrawableLine] = field(default_factory=list)
+    rectangles: List[DrawableRectangle] = field(default_factory=list)
     texts: List[RenderableText] = field(default_factory=list)
 
     def __copy__(self):
         return Image(
-            color_space=self.color_space,
             pixels=self.pixels.copy(),
+            color_space=self.color_space,
             name=self.name,
             bounding_boxes=self.bounding_boxes.copy(),
             circles=self.circles.copy(),
@@ -63,37 +65,44 @@ class Image(Model):
         )
 
     @classmethod
-    def create_from_pixels(cls, pixels: np.ndarray, color_space: ColorSpaces, *args, **kwargs) -> Image:
+    def from_nparray(cls, pixels: np.ndarray, color_space: ColorSpaces, *args, **kwargs) -> Image:
+        assert pixels is not None, 'Pixels cannot be None'
+        assert color_space is not None, 'Color space cannot be None'
+
         return cls(
-            pixels=pixels,
             color_space=color_space,
+            pixels=pixels,
             *args,
             **kwargs
         )
 
     @classmethod
-    def create_from_path(cls, path: str, *args, **kwargs) -> Image:
+    def from_path(cls, path: str, *args, **kwargs) -> Image:
         pixels = cv2.imread(path)
-        return cls.create_from_pixels(
-            pixels,
-            ColorSpaces.BGR,
+
+        assert pixels is not None, f'Could not read image from path {path}'
+
+        return cls.from_nparray(
+            pixels=pixels,
+            color_space=ColorSpaces.BGR,
+            path=path,
             *args,
             **kwargs
         )
 
-    def add_bounding_box(self, bounding_box: BoundingBoxAnnotation):
+    def register_bounding_box(self, bounding_box: DrawableBoundingBox):
         self.bounding_boxes.append(bounding_box)
 
-    def add_circle(self, circle: RenderableCircle):
+    def register_circle(self, circle: DrawableCircle):
         self.circles.append(circle)
 
-    def add_line(self, line: RenderableLine):
+    def register_line(self, line: DrawableLine):
         self.lines.append(line)
 
-    def add_rectangle(self, rectangle: RenderableRectangle):
+    def register_rectangle(self, rectangle: DrawableRectangle):
         self.rectangles.append(rectangle)
 
-    def add_text(self, text: RenderableText):
+    def register_text(self, text: RenderableText):
         self.texts.append(text)
 
     def apply_brightness(self, value: float):
@@ -149,9 +158,6 @@ class Image(Model):
     def concat_vertical(self, image: Image):
         self.pixels = np.concatenate((self.pixels, image.pixels), axis=0)
 
-    def copy(self) -> Image:
-        return self.__copy__()
-
     def iter_resized_copies(self, start, stop, count):
         step = abs(stop - start) / count
 
@@ -161,7 +167,7 @@ class Image(Model):
             copy.resize(scale)
             yield copy
 
-    def render_circles(self):
+    def draw_circles(self):
         for circle in self.circles:
             cv2.circle(
                 self.pixels,
@@ -171,7 +177,7 @@ class Image(Model):
                 thickness=circle.thickness
             )
 
-    def render_lines(self):
+    def draw_lines(self):
         for line in self.lines:
             cv2.line(
                 self.pixels,
@@ -181,7 +187,7 @@ class Image(Model):
                 thickness=line.thickness
             )
 
-    def render_rectangles(self):
+    def draw_rectangles(self):
         for rectangle in self.rectangles:
             cv2.rectangle(
                 self.pixels,
@@ -191,7 +197,13 @@ class Image(Model):
                 thickness=rectangle.thickness
             )
 
-    def render_texts(self):
+    def draw_registered_shapes(self):
+        self.draw_circles()
+        self.draw_lines()
+        self.draw_rectangles()
+        self.draw_texts()
+
+    def draw_texts(self):
         for text in self.texts:
             cv2.putText(
                 self.pixels,
@@ -232,17 +244,16 @@ class Image(Model):
         self.pixels = self.pixels[:, :-pixels]
 
     def trim(self, *args: int):
+        assert len(args) in {1, 2, 4}, f'Invalid number of arguments. Expected 1, 2 or 4. Got: {len(args)}'
+
         if len(args) == 1:
             top = left = bottom = right = args[0]
 
         elif len(args) == 2:
             (top, bottom), (left, right) = args
 
-        elif len(args) == 4:
-            top, bottom, left, right = args
-
         else:
-            raise Exception(f'Invalid number of arguments. Expected 1, 2 or 4. Got: {len(args)}')
+            top, bottom, left, right = args
 
         self.trim_top(top)
         self.trim_left(left)

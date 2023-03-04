@@ -1,10 +1,10 @@
 from dataclasses import dataclass
 
-from amir_dev_studio.computer_vision.models.base import Model
+from amir_dev_studio.computer_vision.models.base import Base
 
 
 @dataclass
-class Color(Model):
+class Color(Base):
     b: int
     g: int
     r: int

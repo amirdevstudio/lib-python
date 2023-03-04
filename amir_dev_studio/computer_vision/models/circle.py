@@ -1,14 +1,14 @@
 from dataclasses import dataclass
 from math import acos, cos, pi, sin
 
-from amir_dev_studio.computer_vision.models.base import Model
+from amir_dev_studio.computer_vision.models.base import Base
 from amir_dev_studio.computer_vision.models.color import Color
 from amir_dev_studio.computer_vision.models.configs import get_default_render_color, get_default_render_thickness
 from amir_dev_studio.computer_vision.models.point import Point
 
 
 @dataclass
-class Circle(Model):
+class Circle(Base):
     center: Point
     radius: float
 
@@ -71,7 +71,7 @@ class Circle(Model):
 
 
 @dataclass
-class RenderableCircle(Circle):
+class DrawableCircle(Circle):
     color: Color
     thickness: int
 

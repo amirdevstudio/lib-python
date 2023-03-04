@@ -1,9 +1,13 @@
+from amir_dev_studio.computer_vision.models.base import Base
 from amir_dev_studio.computer_vision.models.image import Image
 
 
-class ImageGrid:
+class ImageGrid(Base):
     def __init__(self, images: list[Image]):
         self.images = images
+
+    def __copy__(self):
+        return ImageGrid([image.copy() for image in self.images])
 
     def render(self, grid_shape: tuple[int, int] = None) -> Image:
         columns, rows = grid_shape
