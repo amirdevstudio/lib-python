@@ -8,12 +8,8 @@ import numpy as np
 
 from amir_dev_studio.computer_vision.enums import ColorSpaces
 from amir_dev_studio.computer_vision.models.base import Base
-from amir_dev_studio.computer_vision.models.bbox_annotation import DrawableBoundingBox
-from amir_dev_studio.computer_vision.models.circle import DrawableCircle
-from amir_dev_studio.computer_vision.models.line import DrawableLine
+from amir_dev_studio.computer_vision.models.drawable.base import Drawable
 from amir_dev_studio.computer_vision.models.point import Point
-from amir_dev_studio.computer_vision.models.rectangle import DrawableRectangle
-from amir_dev_studio.computer_vision.models.text import RenderableText
 
 
 @dataclass
@@ -23,23 +19,14 @@ class Image(Base):
 
     name: str = 'Untitled'
     path: str = None
-
-    bounding_boxes: List[DrawableBoundingBox] = field(default_factory=list)
-    circles: List[DrawableCircle] = field(default_factory=list)
-    lines: List[DrawableLine] = field(default_factory=list)
-    rectangles: List[DrawableRectangle] = field(default_factory=list)
-    texts: List[RenderableText] = field(default_factory=list)
+    drawables: List[Drawable[np.ndarray]] = field(default_factory=list)
 
     def __copy__(self):
         return Image(
             pixels=self.pixels.copy(),
             color_space=self.color_space,
             name=self.name,
-            bounding_boxes=self.bounding_boxes.copy(),
-            circles=self.circles.copy(),
-            lines=self.lines.copy(),
-            rectangles=self.rectangles.copy(),
-            texts=self.texts.copy()
+            drawables=[item.copy() for item in self.drawables]
         )
 
     def __repr__(self):
@@ -90,20 +77,8 @@ class Image(Base):
             **kwargs
         )
 
-    def register_bounding_box(self, bounding_box: DrawableBoundingBox):
-        self.bounding_boxes.append(bounding_box)
-
-    def register_circle(self, circle: DrawableCircle):
-        self.circles.append(circle)
-
-    def register_line(self, line: DrawableLine):
-        self.lines.append(line)
-
-    def register_rectangle(self, rectangle: DrawableRectangle):
-        self.rectangles.append(rectangle)
-
-    def register_text(self, text: RenderableText):
-        self.texts.append(text)
+    def add_drawable(self, item: Drawable[np.ndarray]):
+        self.drawables.append(item)
 
     def apply_brightness(self, value: float):
         if value > 0:
@@ -167,53 +142,9 @@ class Image(Base):
             copy.resize(scale)
             yield copy
 
-    def draw_circles(self):
-        for circle in self.circles:
-            cv2.circle(
-                self.pixels,
-                circle.center.xy_ints,
-                circle.radius,
-                circle.color.bgr,
-                thickness=circle.thickness
-            )
-
-    def draw_lines(self):
-        for line in self.lines:
-            cv2.line(
-                self.pixels,
-                line.pt1.xy_ints,
-                line.pt2.xy_ints,
-                line.color.bgr,
-                thickness=line.thickness
-            )
-
-    def draw_rectangles(self):
-        for rectangle in self.rectangles:
-            cv2.rectangle(
-                self.pixels,
-                rectangle.top_left.xy_ints,
-                rectangle.bottom_right.xy_ints,
-                rectangle.color.bgr,
-                thickness=rectangle.thickness
-            )
-
-    def draw_registered_shapes(self):
-        self.draw_circles()
-        self.draw_lines()
-        self.draw_rectangles()
-        self.draw_texts()
-
-    def draw_texts(self):
-        for text in self.texts:
-            cv2.putText(
-                self.pixels,
-                text.value,
-                text.position.xy_ints,
-                cv2.FONT_HERSHEY_SIMPLEX,
-                text.font_scale,
-                text.color.bgr,
-                thickness=text.thickness
-            )
+    def render_drawables(self):
+        for drawable in self.drawables:
+            self.pixels = drawable.draw(self.pixels)
 
     def resize(self, scale: float):
         new_width = int(self.width * scale)

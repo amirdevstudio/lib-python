@@ -1,9 +1,13 @@
 from dataclasses import dataclass
 from math import acos, cos, pi, sin
 
+import cv2
+import numpy as np
+
 from amir_dev_studio.computer_vision.models.base import Base
 from amir_dev_studio.computer_vision.models.color import Color
 from amir_dev_studio.computer_vision.models.configs import get_default_render_color, get_default_render_thickness
+from amir_dev_studio.computer_vision.models.drawable.base import Drawable
 from amir_dev_studio.computer_vision.models.point import Point
 
 
@@ -71,9 +75,17 @@ class Circle(Base):
 
 
 @dataclass
-class DrawableCircle(Circle):
+class DrawableCircle(Circle, Drawable[np.ndarray]):
     color: Color
     thickness: int
+
+    def __copy__(self):
+        return DrawableCircle(
+            self.center,
+            self.radius,
+            self.color,
+            self.thickness
+        )
 
     @classmethod
     def from_circle(cls, circle: Circle, color: Color = None, thickness: int = None):
@@ -82,4 +94,13 @@ class DrawableCircle(Circle):
             circle.radius,
             color or get_default_render_color(),
             thickness or get_default_render_thickness(),
+        )
+
+    def draw(self, pixels: np.ndarray) -> np.ndarray:
+        return cv2.circle(
+            pixels,
+            self.center.xy,
+            self.radius,
+            self.color.bgr,
+            self.thickness,
         )

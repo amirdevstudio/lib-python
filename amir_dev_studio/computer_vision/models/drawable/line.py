@@ -1,5 +1,8 @@
 from dataclasses import dataclass, field
 
+import cv2
+import numpy as np
+
 from amir_dev_studio.computer_vision.enums import CardinalDirections, OrdinalDirections
 from amir_dev_studio.computer_vision.models.base import Base
 from amir_dev_studio.computer_vision.models.color import Color
@@ -66,6 +69,9 @@ class DrawableLine(Line):
     color: Color
     thickness: Number
 
+    def __copy__(self):
+        return DrawableLine(self.pt1, self.pt2, self.color, self.thickness)
+
     @classmethod
     def from_line(cls, line: Line, color: Color = None, thickness: Number = None):
         return cls(
@@ -73,4 +79,13 @@ class DrawableLine(Line):
             line.pt2,
             color or get_default_render_color(),
             thickness or get_default_render_thickness()
+        )
+
+    def draw_on_numpy_array(self, image: np.ndarray) -> np.ndarray:
+        return cv2.line(
+            image,
+            self.pt1.xy,
+            self.pt2.xy,
+            self.color.rgb,
+            self.thickness
         )

@@ -1,8 +1,12 @@
 from dataclasses import dataclass
 
+import cv2
+import numpy as np
+
 from amir_dev_studio.computer_vision.models.base import Base
 from amir_dev_studio.computer_vision.models.color import Color
 from amir_dev_studio.computer_vision.models.configs import get_default_render_thickness, get_default_render_color
+from amir_dev_studio.computer_vision.models.drawable.base import Drawable
 from amir_dev_studio.computer_vision.models.point import Point
 
 
@@ -138,7 +142,7 @@ class Rectangle(Base):
 
 
 @dataclass
-class DrawableRectangle(Rectangle):
+class DrawableRectangle(Rectangle, Drawable[np.ndarray]):
     color: Color
     thickness: int
 
@@ -149,5 +153,14 @@ class DrawableRectangle(Rectangle):
             rect.pt2,
             color or get_default_render_color(),
             thickness or get_default_render_thickness()
+        )
+
+    def draw(self, pixels: np.ndarray) -> np.ndarray:
+        return cv2.rectangle(
+            pixels,
+            self.top_left.xy,
+            self.bottom_right.xy,
+            self.color.rgb,
+            self.thickness
         )
 
