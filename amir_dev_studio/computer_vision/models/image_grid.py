@@ -9,7 +9,7 @@ class ImageGrid(Base):
     def __copy__(self):
         return ImageGrid([image.copy() for image in self.images])
 
-    def render(self, grid_shape: tuple[int, int] = None) -> Image:
+    def concat_to_image(self, grid_shape: tuple[int, int] = None) -> Image:
         columns, rows = grid_shape
 
         if not self.images:

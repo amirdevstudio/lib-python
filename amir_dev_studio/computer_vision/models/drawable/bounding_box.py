@@ -15,11 +15,11 @@ class DrawableBoundingBox(Base, Drawable[np.ndarray]):
 
     def __copy__(self):
         return DrawableBoundingBox(
-            self.text,
-            self.rect
+            self.text.copy(),
+            self.rect.copy()
         )
 
-    def draw(self, pixels: np.ndarray) -> np.ndarray:
-        pixels = self.text.draw(pixels)
-        pixels = self.rect.draw(pixels)
+    def draw_on_image(self, pixels: np.ndarray) -> np.ndarray:
+        pixels = self.text.draw_on_image(pixels)
+        pixels = self.rect.draw_on_image(pixels)
         return pixels

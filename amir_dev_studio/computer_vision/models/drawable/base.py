@@ -8,5 +8,5 @@ _T = TypeVar('_T')
 
 class Drawable(Base, ABC, Generic[_T]):
     @abstractmethod
-    def draw(self, pixels: _T) -> _T:
+    def draw_on_image(self, pixels: _T) -> _T:
         pass

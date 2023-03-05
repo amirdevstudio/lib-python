@@ -27,13 +27,13 @@ class DrawableText(Base, Drawable[np.ndarray]):
     def __copy__(self):
         return DrawableText(
             self.value,
-            self.position,
-            self.color,
+            self.position.copy(),
+            self.color.copy(),
             self.font_scale,
             self.thickness
         )
 
-    def draw(self, pixels: np.ndarray) -> np.ndarray:
+    def draw_on_image(self, pixels: np.ndarray) -> np.ndarray:
         return cv2.putText(
             pixels,
             self.value,

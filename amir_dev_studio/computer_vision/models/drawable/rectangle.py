@@ -146,16 +146,15 @@ class DrawableRectangle(Rectangle, Drawable[np.ndarray]):
     color: Color
     thickness: int
 
-    @classmethod
-    def from_rectangle(cls, rect: Rectangle, color: Color = None, thickness: int = None):
-        return cls(
-            rect.pt1,
-            rect.pt2,
-            color or get_default_render_color(),
-            thickness or get_default_render_thickness()
+    def __copy__(self):
+        return DrawableRectangle(
+            self.pt1.copy(),
+            self.pt2.copy(),
+            self.color.copy(),
+            self.thickness
         )
 
-    def draw(self, pixels: np.ndarray) -> np.ndarray:
+    def draw_on_image(self, pixels: np.ndarray) -> np.ndarray:
         return cv2.rectangle(
             pixels,
             self.top_left.xy,

@@ -7,6 +7,7 @@ from amir_dev_studio.computer_vision.enums import CardinalDirections, OrdinalDir
 from amir_dev_studio.computer_vision.models.base import Base
 from amir_dev_studio.computer_vision.models.color import Color
 from amir_dev_studio.computer_vision.models.configs import get_default_render_color, get_default_render_thickness
+from amir_dev_studio.computer_vision.models.drawable.base import Drawable
 from amir_dev_studio.computer_vision.models.point import Point
 from amir_dev_studio.extended_datatypes import Number
 
@@ -65,25 +66,21 @@ class Line(Base):
 
 
 @dataclass
-class DrawableLine(Line):
+class DrawableLine(Line, Drawable[np.ndarray]):
     color: Color
     thickness: Number
 
     def __copy__(self):
-        return DrawableLine(self.pt1, self.pt2, self.color, self.thickness)
-
-    @classmethod
-    def from_line(cls, line: Line, color: Color = None, thickness: Number = None):
-        return cls(
-            line.pt1,
-            line.pt2,
-            color or get_default_render_color(),
-            thickness or get_default_render_thickness()
+        return DrawableLine(
+            self.pt1.copy(),
+            self.pt2.copy(),
+            self.color.copy(),
+            self.thickness
         )
 
-    def draw_on_numpy_array(self, image: np.ndarray) -> np.ndarray:
+    def draw_on_image(self, pixels: np.ndarray) -> np.ndarray:
         return cv2.line(
-            image,
+            pixels,
             self.pt1.xy,
             self.pt2.xy,
             self.color.rgb,

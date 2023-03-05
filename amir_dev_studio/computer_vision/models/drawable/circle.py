@@ -17,7 +17,10 @@ class Circle(Base):
     radius: float
 
     def __copy__(self):
-        return Circle(self.center, self.radius)
+        return Circle(
+            self.center.copy(),
+            self.radius
+        )
 
     @property
     def circumference(self) -> float:
@@ -87,16 +90,7 @@ class DrawableCircle(Circle, Drawable[np.ndarray]):
             self.thickness
         )
 
-    @classmethod
-    def from_circle(cls, circle: Circle, color: Color = None, thickness: int = None):
-        return cls(
-            circle.center,
-            circle.radius,
-            color or get_default_render_color(),
-            thickness or get_default_render_thickness(),
-        )
-
-    def draw(self, pixels: np.ndarray) -> np.ndarray:
+    def draw_on_image(self, pixels: np.ndarray) -> np.ndarray:
         return cv2.circle(
             pixels,
             self.center.xy,

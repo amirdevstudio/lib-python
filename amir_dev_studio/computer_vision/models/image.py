@@ -52,7 +52,7 @@ class Image(Base):
         )
 
     @classmethod
-    def from_nparray(cls, pixels: np.ndarray, color_space: ColorSpaces, *args, **kwargs) -> Image:
+    def from_numpy_array(cls, pixels: np.ndarray, color_space: ColorSpaces, *args, **kwargs) -> Image:
         assert pixels is not None, 'Pixels cannot be None'
         assert color_space is not None, 'Color space cannot be None'
 
@@ -69,7 +69,7 @@ class Image(Base):
 
         assert pixels is not None, f'Could not read image from path {path}'
 
-        return cls.from_nparray(
+        return cls.from_numpy_array(
             pixels=pixels,
             color_space=ColorSpaces.BGR,
             path=path,
@@ -144,7 +144,7 @@ class Image(Base):
 
     def render_drawables(self):
         for drawable in self.drawables:
-            self.pixels = drawable.draw(self.pixels)
+            self.pixels = drawable.draw_on_image(self.pixels)
 
     def resize(self, scale: float):
         new_width = int(self.width * scale)
