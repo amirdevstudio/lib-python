@@ -1,4 +1,4 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 import cv2
 import numpy as np
@@ -6,7 +6,6 @@ import numpy as np
 from amir_dev_studio.computer_vision.enums import CardinalDirections, OrdinalDirections
 from amir_dev_studio.computer_vision.models.base import Base
 from amir_dev_studio.computer_vision.models.color import Color
-from amir_dev_studio.computer_vision.models.configs import get_default_render_color, get_default_render_thickness
 from amir_dev_studio.computer_vision.models.drawable.base import Drawable
 from amir_dev_studio.computer_vision.models.point import Point
 from amir_dev_studio.extended_datatypes import Number

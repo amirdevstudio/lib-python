@@ -1,12 +1,12 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 import cv2
 import numpy as np
 
 from amir_dev_studio.computer_vision.models.base import Base
 from amir_dev_studio.computer_vision.models.color import Color
-from amir_dev_studio.computer_vision.models.configs import get_default_render_thickness, get_default_render_color
 from amir_dev_studio.computer_vision.models.drawable.base import Drawable
+from amir_dev_studio.computer_vision.models.drawable.configs import get_default_render_thickness
 from amir_dev_studio.computer_vision.models.point import Point
 
 
@@ -123,6 +123,12 @@ class Rectangle(Base):
             self.bottom >= other.bottom
         )
 
+    def get_random_point(self) -> Point:
+        return Point(
+            np.random.uniform(self.left + 3, self.right - 3),
+            np.random.uniform(self.top + 3, self.bottom - 3)
+        )
+
     def to_coco_bbox(self) -> tuple[float, float, float, float]:
         return self.top_left.x, self.top_left.y, self.width, self.height
 
@@ -144,7 +150,7 @@ class Rectangle(Base):
 @dataclass
 class DrawableRectangle(Rectangle, Drawable[np.ndarray]):
     color: Color
-    thickness: int
+    thickness: int = field(default_factory=get_default_render_thickness)
 
     def __copy__(self):
         return DrawableRectangle(

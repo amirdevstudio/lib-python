@@ -6,11 +6,11 @@ default_render_font_scale: float = 1.0
 default_render_thickness: int = 1
 
 
-def get_default_render_color() -> Color:
+def get_default_color() -> Color:
     return default_render_color
 
 
-def set_default_render_color(color: Color):
+def set_default_color(color: Color):
     global default_render_color
     default_render_color = color
 

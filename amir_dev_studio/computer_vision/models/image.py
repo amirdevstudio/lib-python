@@ -101,6 +101,7 @@ class Image(Base):
         conversions = {
             (ColorSpaces.BGR, ColorSpaces.GRAY): cv2.COLOR_BGR2GRAY,
             (ColorSpaces.BGR, ColorSpaces.RGB): cv2.COLOR_BGR2RGB,
+            (ColorSpaces.RGB, ColorSpaces.BGR): cv2.COLOR_RGB2BGR,
         }
 
         if not (conversion := conversions.get(conversion_key)):
@@ -155,6 +156,9 @@ class Image(Base):
             (new_width, new_height),
             interpolation=cv2.INTER_AREA
         )
+
+    def save(self, path: str):
+        cv2.imwrite(path, self.pixels)
 
     def show(self, title: str = None, wait_key: int = 0):
         title = title or self.name
