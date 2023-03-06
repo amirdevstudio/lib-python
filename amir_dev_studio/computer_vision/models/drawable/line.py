@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 import cv2
 import numpy as np
@@ -7,6 +7,7 @@ from amir_dev_studio.computer_vision.enums import CardinalDirections, OrdinalDir
 from amir_dev_studio.computer_vision.models.base import Base
 from amir_dev_studio.computer_vision.models.color import Color
 from amir_dev_studio.computer_vision.models.drawable.base import Drawable
+from amir_dev_studio.computer_vision.models.drawable.configs import get_default_draw_color, get_default_draw_thickness
 from amir_dev_studio.computer_vision.models.point import Point
 from amir_dev_studio.extended_datatypes import Number
 
@@ -66,8 +67,8 @@ class Line(Base):
 
 @dataclass
 class DrawableLine(Line, Drawable[np.ndarray]):
-    color: Color
-    thickness: Number
+    color: Color = field(default_factory=get_default_draw_color)
+    thickness: Number = field(default_factory=get_default_draw_thickness)
 
     def __copy__(self):
         return DrawableLine(

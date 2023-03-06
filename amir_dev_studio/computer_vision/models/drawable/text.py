@@ -6,9 +6,9 @@ import numpy as np
 from amir_dev_studio.computer_vision.models.base import Base
 from amir_dev_studio.computer_vision.models.color import Color
 from amir_dev_studio.computer_vision.models.drawable.configs import (
-    get_default_render_thickness,
-    get_default_render_font_scale,
-    get_default_color
+    get_default_draw_thickness,
+    get_default_draw_font_scale,
+    get_default_draw_color
 )
 from amir_dev_studio.computer_vision.models.drawable.base import Drawable
 from amir_dev_studio.computer_vision.models.point import Point
@@ -19,10 +19,10 @@ class DrawableText(Base, Drawable[np.ndarray]):
     value: str
     position: Point
 
-    color: Color = field(default_factory=get_default_color)
-    font_scale: float = field(default_factory=get_default_render_font_scale)
+    color: Color = field(default_factory=get_default_draw_color)
+    font_scale: float = field(default_factory=get_default_draw_font_scale)
     font_face: int = field(default_factory=lambda: cv2.FONT_HERSHEY_SIMPLEX)
-    thickness: int = field(default_factory=get_default_render_thickness)
+    thickness: int = field(default_factory=get_default_draw_thickness)
 
     def __copy__(self):
         return DrawableText(

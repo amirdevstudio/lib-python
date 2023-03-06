@@ -10,11 +10,3 @@ class Drawable(Base, ABC, Generic[_T]):
     @abstractmethod
     def draw_on_image(self, pixels: _T) -> _T:
         pass
-
-    @abstractmethod
-    def translate(self):
-        ...
-
-    @abstractmethod
-    def scale(self):
-        ...
