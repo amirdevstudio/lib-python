@@ -81,8 +81,8 @@ class DrawableLine(Line, Drawable[np.ndarray]):
     def draw_on_image(self, pixels: np.ndarray) -> np.ndarray:
         return cv2.line(
             pixels,
-            self.pt1.xy,
-            self.pt2.xy,
+            self.pt1.xy_ints,
+            self.pt2.xy_ints,
             self.color.rgb,
             self.thickness
         )

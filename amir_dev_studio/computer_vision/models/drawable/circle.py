@@ -93,7 +93,7 @@ class DrawableCircle(Circle, Drawable[np.ndarray]):
     def draw_on_image(self, pixels: np.ndarray) -> np.ndarray:
         return cv2.circle(
             pixels,
-            self.center.xy,
+            self.center.xy_ints,
             self.radius,
             self.color.bgr,
             self.thickness,

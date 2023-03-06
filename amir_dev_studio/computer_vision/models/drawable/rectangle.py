@@ -163,8 +163,8 @@ class DrawableRectangle(Rectangle, Drawable[np.ndarray]):
     def draw_on_image(self, pixels: np.ndarray) -> np.ndarray:
         return cv2.rectangle(
             pixels,
-            self.top_left.xy,
-            self.bottom_right.xy,
+            self.top_left.xy_ints,
+            self.bottom_right.xy_ints,
             self.color.rgb,
             self.thickness
         )

@@ -37,7 +37,7 @@ class DrawableText(Base, Drawable[np.ndarray]):
         return cv2.putText(
             pixels,
             self.value,
-            self.position.xy,
+            self.position.xy_ints,
             self.font_face,
             self.font_scale,
             self.color.rgb,
