@@ -19,14 +19,13 @@ class Image(Base):
 
     name: str = 'Untitled'
     path: str = None
-    drawables: List[Drawable[np.ndarray]] = field(default_factory=list)
 
     def __copy__(self):
         return Image(
             pixels=self.pixels.copy(),
             color_space=self.color_space,
             name=self.name,
-            drawables=[item.copy() for item in self.drawables]
+            path=self.path
         )
 
     def __repr__(self):
@@ -77,8 +76,8 @@ class Image(Base):
             **kwargs
         )
 
-    def add_drawable(self, item: Drawable[np.ndarray]):
-        self.drawables.append(item)
+    def draw(self, drawable: Drawable[np.ndarray]):
+        self.pixels = drawable.draw_on_image(self.pixels)
 
     def apply_brightness(self, value: float):
         if value > 0:
@@ -140,16 +139,12 @@ class Image(Base):
         for i in range(count):
             scale = start + (step * i)
             copy = self.copy()
-            copy.resize(scale)
+            copy.scale(scale)
             yield copy
 
-    def render_drawables(self):
-        for drawable in self.drawables:
-            self.pixels = drawable.draw_on_image(self.pixels)
-
-    def resize(self, scale: float):
-        new_width = int(self.width * scale)
-        new_height = int(self.height * scale)
+    def scale(self, value: float):
+        new_width = int(self.width * value)
+        new_height = int(self.height * value)
 
         self.pixels = cv2.resize(
             self.pixels,
@@ -160,11 +155,13 @@ class Image(Base):
     def save(self, path: str):
         cv2.imwrite(path, self.pixels)
 
-    def show(self, title: str = None, wait_key: int = 0):
+    def show(self, title: str = None, wait_key: int = 0, should_destroy_window: bool = True):
         title = title or self.name
         cv2.imshow(title, self.pixels)
         cv2.waitKey(wait_key)
-        cv2.destroyWindow(title)
+
+        if should_destroy_window:
+            cv2.destroyWindow(title)
 
     def trim_top(self, pixels: int):
         self.pixels = self.pixels[pixels:]
