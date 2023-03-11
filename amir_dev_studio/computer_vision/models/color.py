@@ -25,6 +25,7 @@ class Color(Base):
     @classmethod
     def from_hex(cls, hex_color: str):
         rgb = matplotlib.colors.to_rgb(hex_color)
+        rgb = [int(x * 255) for x in rgb]
         return cls(*rgb[::-1])
 
     def to_hex(self):
