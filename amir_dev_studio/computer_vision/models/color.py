@@ -29,7 +29,8 @@ class Color(Base):
         return cls(*rgb[::-1])
 
     def to_hex(self):
-        return matplotlib.colors.to_hex(self.rgb)
+        rgb = [x / 255 for x in self.rgb]
+        return matplotlib.colors.to_hex(rgb)
 
     def add_tint(self, tint: float):
         self.b = min(float(255), self.b + tint)
