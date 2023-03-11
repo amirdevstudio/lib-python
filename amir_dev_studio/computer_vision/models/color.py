@@ -1,13 +1,15 @@
 from dataclasses import dataclass
 
+import matplotlib
+
 from amir_dev_studio.computer_vision.models.base import Base
 
 
 @dataclass
 class Color(Base):
-    b: int
-    g: int
-    r: int
+    b: float | int
+    g: float | int
+    r: float | int
 
     def __copy__(self):
         return Color(self.b, self.g, self.r)
@@ -19,3 +21,21 @@ class Color(Base):
     @property
     def rgb(self):
         return self.r, self.g, self.b
+
+    @classmethod
+    def from_hex(cls, hex_color: str):
+        rgb = matplotlib.colors.to_rgb(hex_color)
+        return cls(*rgb[::-1])
+
+    def to_hex(self):
+        return matplotlib.colors.to_hex(self.rgb)
+
+    def add_tint(self, tint: float):
+        self.b = min(float(255), self.b + tint)
+        self.g = min(float(255), self.g + tint)
+        self.r = min(float(255), self.r + tint)
+
+    def add_shade(self, shade: float):
+        self.b = max(float(0), self.b - shade)
+        self.g = max(float(0), self.g - shade)
+        self.r = max(float(0), self.r - shade)
