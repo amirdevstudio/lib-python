@@ -32,12 +32,12 @@ class Color(Base):
         rgb = [x / 255 for x in self.rgb]
         return matplotlib.colors.to_hex(rgb)
 
-    def add_tint(self, tint: float):
-        self.b = min(float(255), self.b + tint)
-        self.g = min(float(255), self.g + tint)
-        self.r = min(float(255), self.r + tint)
+    def lighten(self, intensity: float):
+        self.b = min(float(255), self.b + (intensity * 255))
+        self.g = min(float(255), self.g + (intensity * 255))
+        self.r = min(float(255), self.r + (intensity * 255))
 
-    def add_shade(self, shade: float):
-        self.b = max(float(0), self.b - shade)
-        self.g = max(float(0), self.g - shade)
-        self.r = max(float(0), self.r - shade)
+    def darken(self, intensity: float):
+        self.b = max(float(0), self.b - (intensity * 255))
+        self.g = max(float(0), self.g - (intensity * 255))
+        self.r = max(float(0), self.r - (intensity * 255))
