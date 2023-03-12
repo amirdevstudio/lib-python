@@ -15,7 +15,7 @@ class AbstractProvider(ABC):
 class AbstractServiceClassProvider(AbstractProvider, ABC):
     def __init__(
         self,
-        cls,
+        cls: type,
         cls_args: tuple = default_args,
         cls_kwargs: dict = default_kwargs,
     ):

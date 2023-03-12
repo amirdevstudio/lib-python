@@ -5,8 +5,3 @@ from amir_dev_studio.dependency_injection.services import (
     add_transient_service,
     get_service
 )
-
-from amir_dev_studio.dependency_injection.decorators import (
-    register_singleton,
-    register_transient
-)
